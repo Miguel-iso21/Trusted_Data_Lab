@@ -1,0 +1,2 @@
+numero,fecha,tipo,fase_introducido,fase_eliminado,minutos_correccion,defecto_origen,descripcion
+1,2026-11-13,entorno,diseno,pruebas,10,,"CI fallaba al importar extractores/ y pipeline/: pytest sin python -m no agrega la raiz al path. Corregido con pythonpath en pyproject.toml (commit b9de1a1)"
