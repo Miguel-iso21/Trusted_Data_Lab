@@ -63,23 +63,41 @@ los dos registros de tiempo (`calidad/tiempo-*.csv`).
 ## 5. Qué aprendimos
 
 ### Ingeniería de Datos
-[COMPLETAR con un ejemplo propio. Sugerencia: por qué la puerta de calidad manda a cuarentena en
-vez de borrar, y cómo la agregación de 1,729 días a 82 meses reduce los datos 95 % pero pierde la
-volatilidad diaria del dólar.]
+Aprendimos que limpiar no es lo mismo que borrar. Banxico marca con `N/E` los días sin dato; si
+los hubiéramos eliminado con un `dropna()`, nadie sabría cuántos se perdieron ni por qué. Por eso
+la puerta de calidad manda cada registro rechazado a `data/cuarentena/` con su motivo, y los
+atípicos solo se marcan (`atipico_iqr`): un salto en los ingresos puede ser el hallazgo, no un
+error. También vimos que toda reducción tiene un costo. Al agregar el dólar de diario a mensual
+pasamos de 1,729 filas a 82 (−95 %), lo que nos permite compararlo con la serie mensual de INEGI,
+pero perdemos la volatilidad dentro del mes. Si en E2 o E3 nos importa un brinco del dólar en una
+semana, tendremos que volver a la capa plata, que conserva el dato diario.
 
 ### Análisis Estadístico
-[COMPLETAR. Sugerencia: la serie no es estacionaria (ADF p = 0.79) y lo es con una diferencia
-(p = 0.00002), por eso d = 1. El modelo más simple ganó en datos no vistos, y aun así sus
-residuos fallan Ljung-Box.]
+Aprendimos que el modelo más sofisticado no es necesariamente el mejor. Con la prueba de
+Dickey-Fuller vimos que el índice de ingresos veterinarios no es estacionario (p = 0.79) y que lo
+es con una diferencia (p = 0.00002), por eso usamos d = 1 en ARIMA. El ARIMA(2,1,0) tuvo el menor
+AIC (1534.5), pero al probar los cuatro modelos en los últimos 12 meses, que no habían visto,
+ganó el suavizamiento exponencial simple, con un error medio de 16.3 puntos (MAPE 13.4 %). El AIC
+mide qué tan bien se ajusta el modelo a lo que ya conoce; el error en datos de prueba mide qué tan
+bien pronostica, que es lo que le importa al cliente. Y aun el modelo ganador falla Ljung-Box
+(p = 0.00003): sus errores siguen un patrón, así que queda información sin aprovechar. Un
+pronóstico sin revisar sus residuos puede verse bien en la gráfica y estar mal planteado.
 
 ### Calidad en los Sistemas de Información
-[COMPLETAR. Sugerencia: diferencia entre aseguramiento (CI, plan SQA) y control (pruebas, puerta);
-por qué no reportamos una disponibilidad del 0 % o del 100 % con 3 ejecuciones.]
+Aprendimos la diferencia entre asegurar y controlar la calidad. Las pruebas y la puerta de datos
+son *control*: encuentran defectos en lo que ya hicimos. El plan SQA y la integración continua son
+*aseguramiento*: hacen que el defecto no llegue a `main`. Lo vimos con el defecto JMC-1: las
+pruebas pasaban en nuestra computadora y fallaron en GitHub porque se ejecutaban de otra forma.
+Sin la CI no nos habríamos dado cuenta. También aprendimos que una métrica sin suficientes datos
+engaña. Con 3 ejecuciones el script calculó una disponibilidad de 0 % para Banxico y de 100 % para
+INEGI; ninguna de las dos cifras dice algo real. Preferimos reportar que todavía no podemos medir
+la fiabilidad a presentar un número que no se sostiene.
 
 ## 6. Evidencias
 
 - Repositorio: https://github.com/Miguel-iso21/Trusted_Data_Lab
-- Commits: `10fb3c9` (observatorio inicial), `b9de1a1` (corrección de la CI)
+- Commits: `10fb3c9` (observatorio inicial), `b9de1a1` (corrección de la CI), `b6609b8`
+  (plan SQA, requerimientos y fiabilidad), `c1cb078` (primera captura automática), `4b8f432` (tablero)
 - Integración continua: pestaña Actions, corrida "Integracion continua #2" en verde
 - Pronóstico: `laboratorio/salidas/comparacion_modelos.csv`, `pronostico.png`, `residuos.csv`
 - Puerta de calidad: `data/cuarentena/`, `pipeline/limpieza.py`
@@ -87,7 +105,16 @@ por qué no reportamos una disponibilidad del 0 % o del 100 % con 3 ejecuciones.
 
 ## Uso de IA generativa
 
-Usamos **Claude Code** (asistente de código de Anthropic) para [COMPLETAR: qué partes. Por ejemplo,
-estructurar el pipeline, escribir pruebas, diagnosticar el fallo de la CI y redactar los primeros
-borradores del plan SQA, los requerimientos y esta relatoría]. Revisamos y entendemos cada parte
-y podemos explicarla en la defensa.
+Usamos **Claude Code**, el asistente de programación de Anthropic, en el editor (VS Code) para:
+
+- **Código:** escribir los extractores, el pipeline bronce → plata → oro, el laboratorio de
+  pronóstico, el script de fiabilidad, el tablero y las pruebas automáticas, a partir de lo que
+  pide el documento del proyecto.
+- **Depuración:** diagnosticar la falla de la CI (defecto JMC-1) reproduciéndola localmente.
+- **Documentación:** redactar los borradores del plan SQA, los requerimientos, el reporte de
+  fiabilidad, la ficha de entrega y esta relatoría.
+
+Nosotros elegimos el sector y las fuentes, conseguimos los tokens, configuramos GitHub (secrets,
+permisos y captura) y aportamos las horas y los datos reales del proceso. Revisamos cada archivo
+y podemos explicarlo en la defensa. Lo que la IA no podía saber (cuánto tiempo trabajamos, quién
+hizo qué) lo escribimos nosotros, y las cifras salen de los scripts, no de la IA.
