@@ -2,3 +2,5 @@ timestamp_utc,fuente,estado,filas,segundos,error
 2026-11-14T00:03:55+00:00,banxico-sie,falla,0,0.89,400 Client Error: Bad Request for url: https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2020-01-01/2026-11-13
 2026-11-14T00:04:29+00:00,banxico-sie,ok,1729,1.25,
 2026-11-14T00:28:32+00:00,inegi-bise,ok,224,1.44,
+2026-11-14T01:00:09+00:00,banxico-sie,ok,10,1.35,
+2026-11-14T01:00:10+00:00,inegi-bise,ok,224,1.1,
