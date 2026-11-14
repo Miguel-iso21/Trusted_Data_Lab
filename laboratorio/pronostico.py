@@ -2,8 +2,8 @@
 seleccion por error en datos de prueba, residuos y pronostico con intervalo.
 
 Uso:  python -m laboratorio.pronostico [archivo_oro.csv] [columna]
-Por defecto: data/oro/usd_mxn_mensual.csv, columna usd_media.
-Cuando exista la serie del INPC de INEGI, se corre igual cambiando archivo y columna.
+Por defecto: data/oro/vet_ingresos_mensual.csv, columna indice_ingresos (ingresos veterinarios).
+Otra serie: python -m laboratorio.pronostico data/oro/usd_mxn_mensual.csv usd_media
 """
 import itertools
 import sys
@@ -173,5 +173,5 @@ def main(archivo: Path, col: str):
 
 
 if __name__ == "__main__":
-    arch = Path(sys.argv[1]) if len(sys.argv) > 1 else ORO / "usd_mxn_mensual.csv"
-    main(arch, sys.argv[2] if len(sys.argv) > 2 else "usd_media")
+    arch = Path(sys.argv[1]) if len(sys.argv) > 1 else ORO / "vet_ingresos_mensual.csv"
+    main(arch, sys.argv[2] if len(sys.argv) > 2 else "indice_ingresos")

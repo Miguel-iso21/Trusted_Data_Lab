@@ -22,6 +22,7 @@ data/plata/    limpios y validados (puerta de calidad)
 data/oro/      listos para análisis + diccionario_oro.csv
 data/cuarentena/  registros rechazados con su motivo
 laboratorio/   pronóstico (descomposición, ADF, ACF/PACF, SES, Holt, Holt-Winters, ARIMA)
+tablero/       tablero público en Streamlit (solo lee oro y salidas, no llama APIs)
 calidad/       bitácora de capturas y registros PSP
 .github/workflows/  captura diaria (08:00 Colima) e integración continua
 ```
@@ -42,6 +43,8 @@ python -m extractores.banxico reciente
 python -m extractores.inegi
 python -m pipeline.run           # bronce -> plata -> oro
 python -m laboratorio.pronostico # resultados en laboratorio/salidas/
+python -m pipeline.fiabilidad    # MTBF, MTTR y disponibilidad -> calidad/fiabilidad.csv
+streamlit run tablero/app.py     # tablero en http://localhost:8501
 
 pytest --cov                     # pruebas
 ruff check .                     # linter

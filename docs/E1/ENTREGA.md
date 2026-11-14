@@ -27,7 +27,7 @@ menor error en datos no vistos y montamos CI con pruebas, gitleaks y pip-audit, 
 | Estacionariedad y autocorrelación (15) | [`dickey_fuller.csv`](../../laboratorio/salidas/dickey_fuller.csv), [`acf_pacf.png`](../../laboratorio/salidas/acf_pacf.png) | ADF: p = 0.79 en nivel y p = 0.00002 con una diferencia → d = 1. |
 | Cuatro modelos (25) | [`laboratorio/pronostico.py`](../../laboratorio/pronostico.py) | SES, Holt, Holt-Winters y ARIMA(2,1,0); el orden de ARIMA se eligió por AIC. |
 | Selección por error (20) | [`comparacion_modelos.csv`](../../laboratorio/salidas/comparacion_modelos.csv) | Prueba con los últimos 12 meses. Gana SES: MAE 16.31, RMSE 16.64, MAPE 13.4 %. |
-| Residuos y comunicación (15) | [`residuos.csv`](../../laboratorio/salidas/residuos.csv), [`pronostico.csv`](../../laboratorio/salidas/pronostico.csv) | Pronóstico con IC 95 % (sep-2026: 125.6, entre 107.6 y 143.6). **Ljung-Box no se aprueba** (p = 0.00003); se publica con advertencia. |
+| Residuos y comunicación (15) | [`tablero/app.py`](../../tablero/app.py), [`residuos.csv`](../../laboratorio/salidas/residuos.csv), [`pronostico.csv`](../../laboratorio/salidas/pronostico.csv) | Publicado en el tablero con IC 95 % y una frase para el cliente; (sep-2026: 125.6, entre 107.6 y 143.6). **Ljung-Box no se aprueba** (p = 0.00003); se publica con advertencia. |
 
 ## Calidad en los Sistemas de Información
 
