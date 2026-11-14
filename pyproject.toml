@@ -21,6 +21,7 @@ ignore = ["S101"]  # assert en pruebas
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]  # para que `pytest` (sin python -m) encuentre extractores/ y pipeline/
 
 [tool.coverage.run]
 source = ["extractores", "pipeline"]
