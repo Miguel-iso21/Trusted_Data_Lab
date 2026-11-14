@@ -15,20 +15,20 @@ Periodo: 2 al 13 de noviembre de 2026
 ## 2. Qué hicimos
 
 Trabajamos los dos al mismo tiempo en una sola computadora, así que cada bloque aparece igual en
-los dos registros de tiempo (`calidad/tiempo-*.csv`). "Lidera" indica quién llevó el teclado.
+los dos registros de tiempo (`calidad/tiempo-*.csv`).
 
 | Fecha | Qué | Quién | Horas |
 |---|---|---|---|
-| 12-nov 15:00–[COMPLETAR] | [COMPLETAR] | Ambos | [COMPLETAR] |
-| 13-nov 15:00–16:00 | Elección del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 | Lidera José Miguel, en pareja | 1.00 |
-| 13-nov 16:00–17:00 | Extractor ético base, extractores de Banxico e INEGI y bitácora de capturas | Ambos | 1.00 |
-| 13-nov 17:00–18:00 | Pipeline bronce → plata (pandera + cuarentena) → oro (normalización, terciles, diccionario) | Lidera José Miguel, en pareja | 1.00 |
-| 13-nov 18:00–18:32 | Captura histórica (1,729 días de dólar 2020–2026 y 224 meses de ingresos veterinarios 2008-01 a 2026-08), laboratorio de pronóstico (descomposición, ADF, ACF/PACF, SES, Holt, Holt-Winters y ARIMA), pruebas y flujos de captura e integración continua | Ambos | 0.53 |
-| 13-nov 18:32–18:45 | Repositorio git, README y publicación en GitHub | Lidera José Miguel, en pareja | 0.22 |
-| 13-nov 18:45–18:52 | Corrección de la CI (defecto JMC-1) | Ambos | 0.12 |
-| 13-nov 18:52–18:58 | Medición de fiabilidad, plan SQA, requerimientos, relatoría y ficha de entrega | Ambos | 0.10 |
-| 13-nov 18:58–19:05 | Tablero Streamlit; 21 pruebas automáticas (89 % de cobertura) | Ambos | 0.12 |
-| 13-nov 19:05–19:15 | Secrets y permisos de Actions, primera captura automática en GitHub | Ambos | 0.17 |
+| 12-nov 15:00–[COMPLETAR] | [COMPLETAR] | Ambos, en pareja | [COMPLETAR] |
+| 13-nov 15:00–16:00 | Elección del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 | Ambos, en pareja | 1.00 |
+| 13-nov 16:00–17:00 | Extractor ético base, extractores de Banxico e INEGI y bitácora de capturas | Ambos, en pareja | 1.00 |
+| 13-nov 17:00–18:00 | Pipeline bronce → plata (pandera + cuarentena) → oro (normalización, terciles, diccionario) | Ambos, en pareja | 1.00 |
+| 13-nov 18:00–18:32 | Captura histórica (1,729 días de dólar 2020–2026 y 224 meses de ingresos veterinarios 2008-01 a 2026-08), laboratorio de pronóstico (descomposición, ADF, ACF/PACF, SES, Holt, Holt-Winters y ARIMA), pruebas y flujos de captura e integración continua | Ambos, en pareja | 0.53 |
+| 13-nov 18:32–18:45 | Repositorio git, README y publicación en GitHub | Ambos, en pareja | 0.22 |
+| 13-nov 18:45–18:52 | Corrección de la CI (defecto JMC-1) | Ambos, en pareja | 0.12 |
+| 13-nov 18:52–18:58 | Medición de fiabilidad, plan SQA, requerimientos, relatoría y ficha de entrega | Ambos, en pareja | 0.10 |
+| 13-nov 18:58–19:05 | Tablero Streamlit; 21 pruebas automáticas (89 % de cobertura) | Ambos, en pareja | 0.12 |
+| 13-nov 19:05–19:15 | Secrets y permisos de Actions, primera captura automática en GitHub | Ambos, en pareja | 0.17 |
 | | **Total del 13 de noviembre** | | **4.25 h por persona** |
 
 ## 3. Qué decidimos y por qué

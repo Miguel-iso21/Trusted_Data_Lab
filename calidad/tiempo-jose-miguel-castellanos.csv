@@ -1,9 +1,9 @@
 fecha,inicio,fin,interrupcion_min,fase,actividad
-2026-11-13,15:00,16:00,0,planeacion,"Eleccion del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 (lidera Jose Miguel, en pareja)"
+2026-11-13,15:00,16:00,0,planeacion,"Eleccion del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 (en pareja)"
 2026-11-13,16:00,17:00,0,codigo,"Extractor etico base, extractores de Banxico e INEGI y bitacora de capturas (en pareja)"
-2026-11-13,17:00,18:00,0,codigo,"Pipeline bronce-plata-oro con puerta pandera y cuarentena (lidera Jose Miguel, en pareja)"
+2026-11-13,17:00,18:00,0,codigo,"Pipeline bronce-plata-oro con puerta pandera y cuarentena (en pareja)"
 2026-11-13,18:00,18:32,0,codigo,"Captura historica Banxico e INEGI, laboratorio de pronostico, pruebas y workflows (en pareja)"
-2026-11-13,18:32,18:45,0,configuracion,"Git, README y publicacion en GitHub (lidera Jose Miguel, en pareja)"
+2026-11-13,18:32,18:45,0,configuracion,"Git, README y publicacion en GitHub (en pareja)"
 2026-11-13,18:45,18:52,0,pruebas,"Diagnostico y correccion de la falla de la CI, defecto 1 (en pareja)"
 2026-11-13,18:52,18:58,0,documentacion,"Script de fiabilidad, plan SQA, requerimientos, relatoria y ficha de entrega E1 (en pareja)"
 2026-11-13,18:58,19:05,0,codigo,"Tablero Streamlit y prueba del tablero (en pareja)"
