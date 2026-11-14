@@ -1,4 +1,5 @@
 fecha,inicio,fin,interrupcion_min,fase,actividad
+2026-11-12,15:00,18:00,0,planeacion,"Registro y obtencion de los tokens de las APIs de Banxico SIE e INEGI BISE (en pareja)"
 2026-11-13,15:00,16:00,0,planeacion,"Eleccion del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 (en pareja)"
 2026-11-13,16:00,17:00,0,codigo,"Extractor etico base, extractores de Banxico e INEGI y bitacora de capturas (en pareja)"
 2026-11-13,17:00,18:00,0,codigo,"Pipeline bronce-plata-oro con puerta pandera y cuarentena (en pareja)"

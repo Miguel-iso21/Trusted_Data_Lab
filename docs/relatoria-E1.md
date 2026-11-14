@@ -19,7 +19,7 @@ los dos registros de tiempo (`calidad/tiempo-*.csv`).
 
 | Fecha | Qué | Quién | Horas |
 |---|---|---|---|
-| 12-nov 15:00–[COMPLETAR] | [COMPLETAR] | Ambos, en pareja | [COMPLETAR] |
+| 12-nov 15:00–18:00 | Registro y obtención de los tokens de las APIs de Banxico SIE e INEGI BISE | Ambos, en pareja | 3.00 |
 | 13-nov 15:00–16:00 | Elección del sector veterinario y de las fuentes INEGI 716898 y Banxico SF43718 | Ambos, en pareja | 1.00 |
 | 13-nov 16:00–17:00 | Extractor ético base, extractores de Banxico e INEGI y bitácora de capturas | Ambos, en pareja | 1.00 |
 | 13-nov 17:00–18:00 | Pipeline bronce → plata (pandera + cuarentena) → oro (normalización, terciles, diccionario) | Ambos, en pareja | 1.00 |
@@ -29,7 +29,7 @@ los dos registros de tiempo (`calidad/tiempo-*.csv`).
 | 13-nov 18:52–18:58 | Medición de fiabilidad, plan SQA, requerimientos, relatoría y ficha de entrega | Ambos, en pareja | 0.10 |
 | 13-nov 18:58–19:05 | Tablero Streamlit; 21 pruebas automáticas (89 % de cobertura) | Ambos, en pareja | 0.12 |
 | 13-nov 19:05–19:15 | Secrets y permisos de Actions, primera captura automática en GitHub | Ambos, en pareja | 0.17 |
-| | **Total del 13 de noviembre** | | **4.25 h por persona** |
+| | **Total de la etapa (12 y 13 de noviembre)** | | **7.25 h por persona** |
 
 ## 3. Qué decidimos y por qué
 
