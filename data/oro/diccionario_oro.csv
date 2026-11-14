@@ -1,0 +1,14 @@
+tabla,columna,tipo,descripcion,origen
+usd_mxn_mensual,mes,fecha,Primer dia del mes (YYYY-MM-01),"Banxico SIE, agregado"
+usd_mxn_mensual,usd_media,float MXN,Promedio mensual del tipo de cambio FIX,SF43718
+usd_mxn_mensual,usd_cierre,float MXN,Ultimo valor del mes,SF43718
+usd_mxn_mensual,n_obs,int,Dias habiles con dato en el mes,calculado
+usd_mxn_mensual,var_pct,float %,Variacion % de usd_media contra el mes anterior,calculado
+usd_mxn_mensual,usd_z,float,z-score de usd_media (estandarizacion),calculado
+usd_mxn_mensual,usd_minmax,float 0-1,min-max de usd_media (normalizacion),calculado
+usd_mxn_mensual,nivel,texto,Discretizacion por terciles: bajo/medio/alto,calculado
+vet_ingresos_mensual,mes,fecha,Primer dia del mes (YYYY-MM-01),INEGI EMS
+vet_ingresos_mensual,indice_ingresos,float,"Ingresos totales, servicios veterinarios para mascotas (541941), sector privado, indice base 2018=100. Estimacion de encuesta (con error muestral)",INEGI BISE 716898
+vet_ingresos_mensual,ingresos_z,float,z-score de indice_ingresos,calculado
+vet_ingresos_mensual,ingresos_minmax,float 0-1,min-max de indice_ingresos,calculado
+vet_ingresos_mensual,nivel,texto,Discretizacion por terciles: bajo/medio/alto,calculado

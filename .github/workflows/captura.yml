@@ -1,0 +1,70 @@
+name: Captura diaria
+
+on:
+  schedule:
+    - cron: "0 14 * * *" # 08:00 en Colima (UTC-6)
+  workflow_dispatch: # permite correrla a mano desde la pestana Actions
+
+permissions:
+  contents: write # para guardar datos y bitacora en el repo
+
+concurrency:
+  group: captura
+  cancel-in-progress: false
+
+jobs:
+  capturar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      # Cada fuente corre aunque la otra falle: la falla queda en la bitacora (dato de fiabilidad).
+      - name: Banxico (tipo de cambio, diario)
+        id: banxico
+        continue-on-error: true
+        env:
+          BANXICO_TOKEN: ${{ secrets.BANXICO_TOKEN }}
+          TDL_CONTACTO: ${{ vars.TDL_CONTACTO }}
+        run: python -m extractores.banxico reciente
+
+      - name: INEGI (ingresos de servicios veterinarios, mensual)
+        id: inegi
+        continue-on-error: true
+        env:
+          INEGI_TOKEN: ${{ secrets.INEGI_TOKEN }}
+          TDL_CONTACTO: ${{ vars.TDL_CONTACTO }}
+        run: python -m extractores.inegi
+
+      - name: Pipeline bronce -> plata -> oro (puerta de calidad)
+        id: pipeline
+        continue-on-error: true
+        run: python -m pipeline.run
+
+      - name: Guardar datos y bitacora en el repo
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data calidad/bitacora_capturas.csv
+          if git diff --cached --quiet; then
+            echo "Sin cambios que guardar"
+          else
+            git commit -m "captura automatica $(date -u +%F)"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Marcar la ejecucion como fallida si algun paso fallo
+        if: steps.banxico.outcome == 'failure' || steps.inegi.outcome == 'failure' || steps.pipeline.outcome == 'failure'
+        run: |
+          echo "banxico=${{ steps.banxico.outcome }} inegi=${{ steps.inegi.outcome }} pipeline=${{ steps.pipeline.outcome }}"
+          exit 1

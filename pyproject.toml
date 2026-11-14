@@ -1,0 +1,26 @@
+[project]
+name = "tdl-vet-colima"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = ["data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "BLE", "S"]
+ignore = ["S101"]  # assert en pruebas
+
+[tool.ruff.lint.per-file-ignores]
+# Los extractores atrapan cualquier falla a proposito: toda falla se registra en la bitacora (fiabilidad).
+"extractores/banxico.py" = ["BLE001"]
+"extractores/inegi.py" = ["BLE001"]
+# En la busqueda de ARIMA por AIC, un orden que no converge se descarta y se prueba el siguiente.
+"laboratorio/pronostico.py" = ["BLE001", "S112", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["extractores", "pipeline"]
