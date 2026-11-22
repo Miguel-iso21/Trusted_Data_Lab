@@ -20,3 +20,5 @@ timestamp_utc,fuente,estado,filas,segundos,error
 2026-11-20T21:41:03+00:00,inegi-bise,ok,225,1.12,
 2026-11-21T20:23:21+00:00,banxico-sie,ok,10,0.89,
 2026-11-21T20:23:23+00:00,inegi-bise,ok,225,1.06,
+2026-11-22T20:35:55+00:00,banxico-sie,ok,9,0.88,
+2026-11-22T20:35:57+00:00,inegi-bise,ok,225,1.09,
