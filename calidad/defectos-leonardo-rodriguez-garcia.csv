@@ -1,1 +1,2 @@
 numero,fecha,tipo,fase_introducido,fase_eliminado,minutos_correccion,defecto_origen,descripcion
+1,2026-11-23,datos,pruebas,pruebas,10,,"Dos registros de control de DENUE tenían coordenadas fuera de Colima y nulas. Se verificó que la puerta de calidad los enviara a cuarentena con motivo_rechazo"

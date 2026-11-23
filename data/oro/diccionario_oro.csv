@@ -1,14 +1,42 @@
 tabla,columna,tipo,descripcion,origen
-usd_mxn_mensual,mes,fecha,Primer dia del mes (YYYY-MM-01),"Banxico SIE, agregado"
+usd_mxn_mensual,mes,fecha,Primer día del mes (YYYY-MM-01),"Banxico SIE, agregado"
 usd_mxn_mensual,usd_media,float MXN,Promedio mensual del tipo de cambio FIX,SF43718
-usd_mxn_mensual,usd_cierre,float MXN,Ultimo valor del mes,SF43718
-usd_mxn_mensual,n_obs,int,Dias habiles con dato en el mes,calculado
-usd_mxn_mensual,var_pct,float %,Variacion % de usd_media contra el mes anterior,calculado
-usd_mxn_mensual,usd_z,float,z-score de usd_media (estandarizacion),calculado
-usd_mxn_mensual,usd_minmax,float 0-1,min-max de usd_media (normalizacion),calculado
-usd_mxn_mensual,nivel,texto,Discretizacion por terciles: bajo/medio/alto,calculado
-vet_ingresos_mensual,mes,fecha,Primer dia del mes (YYYY-MM-01),INEGI EMS
-vet_ingresos_mensual,indice_ingresos,float,"Ingresos totales, servicios veterinarios para mascotas (541941), sector privado, indice base 2018=100. Estimacion de encuesta (con error muestral)",INEGI BISE 716898
+usd_mxn_mensual,usd_cierre,float MXN,Último valor del mes,SF43718
+usd_mxn_mensual,n_obs,int,Días hábiles con dato en el mes,calculado
+usd_mxn_mensual,var_pct,float %,Variación % de usd_media contra el mes anterior,calculado
+usd_mxn_mensual,usd_z,float,z-score de usd_media (estandarización),calculado
+usd_mxn_mensual,usd_minmax,float 0-1,min-max de usd_media (normalización),calculado
+usd_mxn_mensual,nivel,texto,Discretización por terciles: bajo/medio/alto,calculado
+usd_mxn_mensual,archivo_bronce_origen,texto,Archivo CSV crudo en data/bronce/banxico/,trazabilidad linaje
+usd_mxn_mensual,fecha_ingesta,timestamp ISO,Fecha y hora UTC de la captura en capa bronce,trazabilidad linaje
+usd_mxn_mensual,fuente_origen,texto,Identificador del proveedor oficial (banxico-sie),trazabilidad linaje
+vet_ingresos_mensual,mes,fecha,Primer día del mes (YYYY-MM-01),INEGI EMS
+vet_ingresos_mensual,indice_ingresos,float,"Ingresos totales, servicios veterinarios para mascotas (541941), sector privado, índice base 2018=100. Estimación de encuesta (con error muestral)",INEGI BISE 716898
 vet_ingresos_mensual,ingresos_z,float,z-score de indice_ingresos,calculado
 vet_ingresos_mensual,ingresos_minmax,float 0-1,min-max de indice_ingresos,calculado
-vet_ingresos_mensual,nivel,texto,Discretizacion por terciles: bajo/medio/alto,calculado
+vet_ingresos_mensual,nivel,texto,Discretización por terciles: bajo/medio/alto,calculado
+vet_ingresos_mensual,archivo_bronce_origen,texto,Archivo CSV crudo en data/bronce/inegi/,trazabilidad linaje
+vet_ingresos_mensual,fecha_ingesta,timestamp ISO,Fecha y hora UTC de la captura en capa bronce,trazabilidad linaje
+vet_ingresos_mensual,fuente_origen,texto,Identificador del proveedor oficial (inegi-bise),trazabilidad linaje
+denue_colima_geo,id_denue,int/texto,Identificador único de unidad económica en DENUE,INEGI DENUE
+denue_colima_geo,nombre_comercial,texto,Nombre público o comercial del establecimiento,INEGI DENUE
+denue_colima_geo,razon_social,texto,Razón social de la empresa (sin nombres de personas físicas),INEGI DENUE
+denue_colima_geo,codigo_actividad,texto,Código de 6 dígitos del SCIAN,INEGI DENUE
+denue_colima_geo,categoria_servicio,texto,Categoría estandarizada en el observatorio,calculado
+denue_colima_geo,estrato_personal,texto,"Rango de personas ocupadas (0 a 5, 6 a 10, etc.)",INEGI DENUE
+denue_colima_geo,municipio,texto,Municipio del Estado de Colima,INEGI DENUE
+denue_colima_geo,zona_urbana,texto,Agrupación geográfica funcional del estado,calculado espacial
+denue_colima_geo,latitud,float,Latitud en grados decimales (WGS84),INEGI DENUE
+denue_colima_geo,longitud,float,Longitud en grados decimales (WGS84),INEGI DENUE
+denue_colima_geo,archivo_bronce_origen,texto,Archivo CSV crudo en data/bronce/denue/,trazabilidad linaje
+denue_colima_geo,fecha_ingesta,timestamp ISO,Fecha y hora UTC de captura en capa bronce,trazabilidad linaje
+denue_colima_geo,fuente_origen,texto,Identificador del proveedor oficial (inegi-denue),trazabilidad linaje
+denue_resumen_municipal,municipio,texto,Nombre del municipio de Colima,INEGI DENUE
+denue_resumen_municipal,zona_urbana,texto,Región funcional del estado,calculado
+denue_resumen_municipal,total_establecimientos,int,Conteo total de establecimientos del sector animal,calculado
+denue_resumen_municipal,total_veterinarias,int,Conteo de clínicas y consultorios veterinarios (541941),calculado
+denue_resumen_municipal,total_pet_shops,int,Conteo de tiendas de mascotas y alimentos (461121),calculado
+denue_resumen_municipal,total_esteticas,int,Conteo de estéticas y cuidado canino (812110),calculado
+denue_resumen_municipal,pct_micro_0_a_5,float %,Porcentaje de microestablecimientos de 0 a 5 personas,calculado
+denue_resumen_municipal,fuente_origen,texto,Fuente de datos oficial,trazabilidad linaje
+denue_resumen_municipal,fecha_actualizacion,fecha,Fecha de generación del resumen (YYYY-MM-DD),calculado

@@ -1,2 +1,3 @@
 numero,fecha,tipo,fase_introducido,fase_eliminado,minutos_correccion,defecto_origen,descripcion
 1,2026-11-13,entorno,diseno,pruebas,10,,"CI fallaba al importar extractores/ y pipeline/: pytest sin python -m no agrega la raiz al path. Corregido con pythonpath en pyproject.toml (commit b9de1a1)"
+2,2026-11-23,interfaz,codigo,pruebas,15,,"gdf.to_file() requería pyogrio/GDAL DLLs en Windows. Corregido exportando GeoJSON directamente con gdf.to_json() en pipeline/limpieza.py y pipeline/oro.py"

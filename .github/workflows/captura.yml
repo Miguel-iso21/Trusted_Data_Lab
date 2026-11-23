@@ -44,6 +44,14 @@ jobs:
           TDL_CONTACTO: ${{ vars.TDL_CONTACTO }}
         run: python -m extractores.inegi
 
+      - name: INEGI DENUE (directorio geoespacial de mascotas, especializado E2)
+        id: denue
+        continue-on-error: true
+        env:
+          INEGI_TOKEN: ${{ secrets.INEGI_TOKEN }}
+          TDL_CONTACTO: ${{ vars.TDL_CONTACTO }}
+        run: python -m extractores.denue
+
       - name: Pipeline bronce -> plata -> oro (puerta de calidad)
         id: pipeline
         continue-on-error: true

@@ -12,18 +12,20 @@ que encarece medicamentos, vacunas y alimento importados.
 |---|---|---|---|
 | INEGI BISE, indicador 716898 | Ingresos de servicios veterinarios para mascotas (SCIAN 541941), índice 2018=100 | Mensual, desde 2008 | API con token |
 | Banxico SIE, serie SF43718 | Tipo de cambio FIX MXN por USD | Diaria (días hábiles) | API con token |
+| INEGI DENUE (Especializada E2) | Directorio georreferenciado de veterinarias, alimentos y estéticas en Colima | Actualización continua | API con token / datos abiertos |
 
 ## Arquitectura
 
 ```
 extractores/   captura ética (robots.txt, User-Agent, pausa entre peticiones)
 data/bronce/   datos crudos con fecha y origen de captura
-data/plata/    limpios y validados (puerta de calidad)
-data/oro/      listos para análisis + diccionario_oro.csv
+data/plata/    limpios y validados (puerta de calidad + GeoPandas)
+data/oro/      listos para análisis con linaje completo + diccionario_oro.csv
 data/cuarentena/  registros rechazados con su motivo
 laboratorio/   pronóstico (descomposición, ADF, ACF/PACF, SES, Holt, Holt-Winters, ARIMA)
-tablero/       tablero público en Streamlit (solo lee oro y salidas, no llama APIs)
+tablero/       tablero público en Streamlit con visualización cartográfica (solo lee oro y salidas)
 calidad/       bitácora de capturas y registros PSP
+docs/          plan SQA, requerimientos, ética (etica-datos.md), linaje y fichas E0-E2
 .github/workflows/  captura diaria (08:00 Colima) e integración continua
 ```
 
@@ -41,12 +43,13 @@ set TDL_CONTACTO=correo-del-equipo
 
 python -m extractores.banxico reciente
 python -m extractores.inegi
-python -m pipeline.run           # bronce -> plata -> oro
+python -m extractores.denue       # captura geoespacial DENUE
+python -m pipeline.run           # bronce -> plata -> oro (valida puerta de calidad)
 python -m laboratorio.pronostico # resultados en laboratorio/salidas/
 python -m pipeline.fiabilidad    # MTBF, MTTR y disponibilidad -> calidad/fiabilidad.csv
 streamlit run tablero/app.py     # tablero en http://localhost:8501
 
-pytest --cov                     # pruebas
+pytest                           # pruebas automáticas
 ruff check .                     # linter
 ```
 
