@@ -1,0 +1,12 @@
+fecha,serie,valor,fuente,url_origen,capturado_en
+2026-11-10,SF43718,18.6678,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-11,SF43718,18.6192,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-12,SF43718,18.6188,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-13,SF43718,18.5525,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-17,SF43718,18.4677,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-18,SF43718,18.6723,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-19,SF43718,19.027,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-20,SF43718,19.0228,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-23,SF43718,19.1648,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-24,SF43718,19.3668,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
+2026-11-25,SF43718,19.704,banxico-sie,https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2026-11-10/2026-11-25,2026-11-25T22:56:46+00:00
