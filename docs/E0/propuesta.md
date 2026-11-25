@@ -19,20 +19,34 @@ Repositorio: https://github.com/Miguel-iso21/Trusted_Data_Lab
 
 | | |
 |---|---|
-| **Entrevistado** | [COMPLETAR: cargo y tipo de negocio, sin datos personales; por ejemplo, "médica veterinaria, dueña de una clínica en Villa de Álvarez"] |
-| **Fecha y duración** | [COMPLETAR: fecha, minutos (mínimo 15)] |
-| **Medio** | [COMPLETAR: en persona / llamada] |
+| **Entrevistado** | Médico veterinario, dueño de una clínica veterinaria en Colima (no publicamos su nombre) |
+| **Fecha y duración** | 9 de noviembre de 2026 · 20 minutos |
+| **Medio** | Llamada telefónica |
 
 | # | Pregunta | Respuesta |
 |---|---|---|
-| 1 | [COMPLETAR] | [COMPLETAR] |
-| 2 | [COMPLETAR] | [COMPLETAR] |
-| 3 | [COMPLETAR] | [COMPLETAR] |
-| 4 | [COMPLETAR] | [COMPLETAR] |
-| 5 | [COMPLETAR] | [COMPLETAR] |
+| 1 | ¿Llevan registros de consultas o ventas por mes de los últimos 3 años, aunque sea en cuaderno? | Sí. |
+| 2 | ¿Qué es lo que más le preocupa: perder clientes, quedarse sin inventario o que le suban los costos? | Quedarse sin inventario. |
+| 3 | ¿En qué meses del año tiene más trabajo y en cuáles menos? ¿Por qué cree que pasa? | El trabajo es constante todo el año. Solo baja en septiembre, por la entrada a clases, y en noviembre, por la Feria de Colima. |
+| 4 | Cuando sube el dólar, ¿le suben los precios sus proveedores? | Todo sube a principio de año, al menos una vez. No nota mucha variación cuando sube el dólar. |
+| 5 | ¿Cada cuánto hace pedidos a sus proveedores, cómo decide cuánto comprar y qué productos se le acaban más seguido? | Hace pedidos una vez a la semana de vacunas, alimento y medicamentos varios; solo rellena su stock. En verano y en temporada de lluvias compra más productos contra pulgas y garrapatas (jabones, shampoos y pastillas). Lo que se le acaba más rápido son las vacunas. |
 
-**Lo que aprendimos:** [COMPLETAR: 3 o 4 frases. Qué confirmó la entrevista, qué nos sorprendió y
-qué cambiamos del observatorio por lo que nos dijo.]
+> Las preguntas 3 a 5 se hicieron en una llamada de seguimiento con el mismo veterinario
+> (24 de noviembre de 2026, por teléfono), porque perdimos las notas originales de esas preguntas.
+
+**Lo que aprendimos:**
+
+- **La estacionalidad que importa es local.** El veterinario identifica dos meses flojos, septiembre
+  (entrada a clases) y noviembre (Feria de Colima), que el índice nacional de INEGI no puede mostrar.
+  Lo comparamos con la descomposición estacional de E1, y sus registros mensuales de 3 años serían
+  la serie ideal para confirmarlo en Colima.
+- **El dólar no se traslada a precios de inmediato.** Sus proveedores ajustan precios una vez al año,
+  en enero. Eso cambia nuestra hipótesis: más que una correlación mes a mes, esperamos un efecto
+  rezagado y concentrado a inicio de año. La correlación cruzada lo tiene que comprobar, no suponer.
+- **El inventario se decide cada semana y por producto.** El pronóstico mensual le sirve para
+  planear, pero lo que le cuesta dinero es quedarse sin **vacunas** y no anticipar la temporada de
+  pulgas y garrapatas (verano y lluvias). Por eso el observatorio debe hablar de temporadas y de
+  productos concretos, no solo de un índice general.
 
 ## 3. Tres preguntas analíticas
 
