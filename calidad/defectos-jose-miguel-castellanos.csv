@@ -1,3 +1,5 @@
 numero,fecha,tipo,fase_introducido,fase_eliminado,minutos_correccion,defecto_origen,descripcion
 1,2026-11-13,entorno,diseno,pruebas,10,,"CI fallaba al importar extractores/ y pipeline/: pytest sin python -m no agrega la raiz al path. Corregido con pythonpath en pyproject.toml (commit b9de1a1)"
 2,2026-11-23,interfaz,codigo,pruebas,15,,"gdf.to_file() requería pyogrio/GDAL DLLs en Windows. Corregido exportando GeoJSON directamente con gdf.to_json() en pipeline/limpieza.py y pipeline/oro.py"
+3,2026-11-26,asignacion,codigo,pruebas,5,,"Experimento E2: el factor C del 2^3 chocaba con la funcion C() de las formulas de statsmodels/patsy y el ANOVA no corria. Corregido renombrando el factor a T solo dentro del modelo (laboratorio/experimento.py)"
+4,2026-11-26,funcion,diseno,revision,10,,"Experimento E2: Levene por tratamiento con 2 replicas degenera (p ~ 1e-118) porque las desviaciones a la mediana son identicas. Sustituido por Breusch-Pagan y confirmado con errores robustos HC3"

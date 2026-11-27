@@ -46,6 +46,8 @@ python -m extractores.inegi
 python -m extractores.denue       # captura geoespacial DENUE
 python -m pipeline.run           # bronce -> plata -> oro (valida puerta de calidad)
 python -m laboratorio.pronostico # resultados en laboratorio/salidas/
+python -m laboratorio.experimento                  # experimento factorial E2 (mide y analiza)
+python -m laboratorio.experimento --solo-analisis  # recalcula desde los CSV guardados
 python -m pipeline.fiabilidad    # MTBF, MTTR y disponibilidad -> calidad/fiabilidad.csv
 streamlit run tablero/app.py     # tablero en http://localhost:8501
 

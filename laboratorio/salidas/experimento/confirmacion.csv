@@ -1,0 +1,11 @@
+orden_corrida,configuracion,formato,motor,segundos,mal_clasificados
+1,actual,csv,pandera,0.15934630000083416,0
+2,optimo,parquet,pandera,0.09444819999953324,0
+3,actual,csv,pandera,0.1425831999986258,0
+4,optimo,parquet,pandera,0.0913025000008929,0
+5,optimo,parquet,pandera,0.09751590000087162,0
+6,actual,csv,pandera,0.14593190000050527,0
+7,actual,csv,pandera,0.14702930000021297,0
+8,optimo,parquet,pandera,0.09593159999894851,0
+9,optimo,parquet,pandera,0.0918113000006997,0
+10,actual,csv,pandera,0.15304199999991397,0

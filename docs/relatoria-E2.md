@@ -10,6 +10,7 @@ Periodo: 17 al 23 de noviembre de 2026
 - Integrar una fuente de datos especializada al observatorio: el Directorio Estadístico Nacional de Unidades Económicas (INEGI DENUE) georreferenciado mediante GeoPandas, con visualización cartográfica en el tablero público y estricta política de cero datos personales (LFPDPPP).
 - Garantizar la trazabilidad y el linaje bidireccional completo en la Capa Oro, asegurando que cada registro de todas las tablas analíticas identifique su archivo de origen en Capa Bronce, su proveedor y su fecha-hora UTC de ingesta.
 - Formalizar la Declaración de Ética y Legalidad (`docs/etica-datos.md`) evaluando términos de uso, análisis técnico de `robots.txt`, licencias de datos abiertas y protocolos de mitigación de sesgos.
+- Correr un experimento factorial 2³ con réplicas, aleatorización y bloqueo, y confirmar su combinación óptima con una corrida de confirmación.
 
 ---
 
@@ -28,6 +29,11 @@ Trabajamos ambos integrantes al mismo tiempo en una sola computadora (programaci
 | 22-nov 15:00–17:00 | Visualización cartográfica interactiva, filtros espaciales y visores de trazabilidad en Streamlit (`tablero/app.py`) | Ambos, en pareja | 2.00 |
 | 23-nov 10:00–11:45 | Pruebas unitarias (`tests/test_denue.py`, `tests/test_linaje.py`), corrección del defecto JMC-2 (GDAL) y relatoría E2 | Ambos, en pareja | 1.75 |
 | | **Total de la etapa E2 (17 al 23 de noviembre)** | | **13.75 h por persona** |
+| 26-nov [COMPLETAR: hora] | **Después de la etiqueta `e2` (entrega tardía):** cambio a la ruta de ingeniería; experimento 2³, diseño de dos factores, 2⁴ vs. 2⁴⁻¹ y confirmación (`laboratorio/experimento.py`, `docs/experimento-E2.md`) | [COMPLETAR] | [COMPLETAR] |
+
+La etiqueta `e2` (23 de noviembre) se puso **sin** el experimento factorial: la ficha de entrega
+describía un experimento de negocio que no se había corrido. El 26 de noviembre lo corregimos: se
+corrió el experimento por la ruta de ingeniería y se actualizaron la ficha y esta relatoría.
 
 ---
 
@@ -45,6 +51,10 @@ Trabajamos ambos integrantes al mismo tiempo en una sola computadora (programaci
    *Decisión:* La eliminación de datos de personas físicas (propietarios, teléfonos residenciales, correos personales) se realiza en el extractor (`extractores/denue.py`) antes de que el archivo toque el disco en `data/bronce/`.  
    *Alternativas descartadas:* Filtrar los datos en la etapa de limpieza de Capa Plata. Se descartó en cumplimiento estricto con la LFPDPPP: almacenar datos personales en crudo dentro de un repositorio de control de versiones constituiría un tratamiento y almacenamiento no autorizado, exponiendo el proyecto a riesgos de seguridad y no conformidades legales.
 
+4. **Experimento por la ruta de ingeniería en vez de la ruta de negocio.**
+   *Decisión:* El 2³ se corrió sobre la puerta de calidad del propio pipeline: formato de plata (CSV vs. Parquet) × motor de validación (fila por fila vs. pandera) × tamaño del lote (×1 vs. ×20), contra una copia local de los datos.
+   *Alternativa descartada:* La ruta de negocio (mensaje × imagen × horario en las publicaciones de la veterinaria entrevistada). No confirmamos el acuerdo a tiempo para correr 16 publicaciones. Además, la ruta de ingeniería sirve como evidencia de eficiencia de desempeño en ISO/IEC 25010 y como base de la optimización medida de E3.
+
 ---
 
 ## 4. Qué salió mal y cómo lo corregimos
@@ -55,6 +65,8 @@ Trabajamos ambos integrantes al mismo tiempo en una sola computadora (programaci
 - **Defecto LRG-1 (datos - registrado en `calidad/defectos-leonardo-rodriguez-garcia.csv`):**  
   Para validar la robustez de la Puerta de Calidad geoespacial, inyectamos intencionalmente dos registros de control: uno fuera de los límites estatales de Colima (CDMX) y otro con coordenadas nulas. El validador inicial fallaba al procesar coordenadas nulas lanzando `TypeError`.  
   *Corrección:* Se blindó la función `validar_denue()` con validación defensiva de tipos, asegurando que ambos registros defectuosos terminen en `data/cuarentena/denue_rechazados.csv` con su `motivo_rechazo` explícito, sin interrumpir el pipeline y manteniendo la tasa de rechazo en 4.44 % ($\le 5.0\,\%$).
+- **La ficha de E2 afirmaba trabajo que no existía.** Al etiquetar `e2`, la ficha describía como hechos un experimento de negocio con 16 corridas, evaluaciones ISO/IEC 25010 y 25012, un cuadro normativo y una auditoría cruzada, sin evidencia en el repositorio. Lo detectamos el 26 de noviembre al revisar los enlaces. *Corrección:* corrimos el experimento (ruta de ingeniería) y marcamos como pendiente en la ficha todo lo que aún no tiene evidencia. *Lección:* ninguna fila de la ficha se escribe antes de que exista el archivo al que enlaza.
+- **Defectos JMC-3 y JMC-4 (experimento):** el factor `C` chocaba con la función `C()` de las fórmulas de statsmodels (se renombró dentro del modelo), y la prueba de Levene degeneraba con 2 réplicas por celda (se sustituyó por Breusch-Pagan, confirmado con errores robustos HC3).
 
 ---
 
@@ -64,10 +76,10 @@ Trabajamos ambos integrantes al mismo tiempo en una sola computadora (programaci
 Comprendimos que la integración de datos geoespaciales impone retos dimensionales que van más allá del análisis tabular clásico. Una coordenada geográfica no es simplemente un par de números flotantes: requiere un Sistema de Referencia de Coordenadas (CRS) estandarizado (EPSG:4326 - WGS84) y validaciones espaciales estrictas (bounding boxes) para evitar que datos erróneos de otras entidades contaminen los análisis locales. Asimismo, aprendimos que la privacidad según la LFPDPPP se diseña desde la arquitectura (Privacy by Design): el mejor dato personal protegido es aquel que nunca se llega a persistir en la Capa Bronce. La trazabilidad fila a fila en la Capa Oro transforma un dataset opaco en una fuente fidedigna y totalmente auditable.
 
 ### Análisis Estadístico
-Comprendimos la relevancia del diseño experimental multifactorial para pasar de la simple observación pasiva a la intervención causal. Mientras que en E1 modelamos el pronóstico de la demanda con series de tiempo, en E2 la estructuración del experimento $2^3$ permite aislar los efectos principales y las interacciones entre mensaje, imagen y horario, descartando variables confusas mediante aleatorización y réplicas. El análisis comparativo entre un diseño factorial completo ($2^4$) y uno fraccionado ($2^{4-1}$) nos demostró cómo se pueden economizar corridas experimentales a cambio de confundir interacciones de orden superior (alias), principio clave para la optimización de recursos en proyectos de ciencia de datos.
+Aprendimos que un experimento dice qué causa la diferencia, no solo que existe. En el 2³ sobre la puerta de calidad, el motor de validación explicó casi todo: con pandera el tiempo baja a la cuarta parte, y la interacción motor × tamaño (p = 0.0003) muestra que la ventaja crece con el lote, porque con ×20 pandera es unas 11 veces más rápido. El formato, en cambio, no fue significativo con 2 réplicas (p = 0.87). Pero en la corrida de confirmación, con 5 réplicas por lado, Parquet + pandera fue 37 % más rápido que la configuración actual (p = 3 × 10⁻⁷): un efecto real que el diseño chico no tenía potencia para separar del ruido. También aprendimos que el bloqueo sí importa: el bloque salió significativo (p = 0.013) porque la computadora no estuvo igual de cargada en las dos tandas. Y al comparar el 2⁴ con el 2⁴⁻¹ vimos que la fracción ahorra la mitad de las corridas, pero confundiría nuestra interacción más fuerte (B × C) con A × D.
 
 ### Calidad en los Sistemas de Información
-Aprendimos a aplicar los modelos de calidad formalmente: la norma **ISO/IEC 25010** para la evaluación del producto de software (demostrando adecuación funcional, fiabilidad y mantenibilidad) y la norma **ISO/IEC 25012** para la evaluación de los datos (evaluando exactitud, completitud, consistencia, credibilidad y actualidad sobre la Capa Oro). Entendimos la evolución histórica desde la antigua norma ISO/IEC 9126 hacia la familia ISO/IEC 25000 (SQuaRE), alineada al enfoque de procesos de ISO 9001. La auditoría cruzada nos enseñó a evaluar un observatorio ajeno con criterio objetivo, clasificando hallazgos por severidad (crítico, mayor, menor) y emitiendo recomendaciones constructivas basadas en evidencia.
+[PENDIENTE: este párrafo se escribe cuando existan la evaluación ISO/IEC 25010, la medición ISO/IEC 25012 sobre la capa oro, el cuadro 9126 → SQuaRE → ISO 9001 y el reporte de la auditoría cruzada. La versión anterior describía como aprendido un trabajo que todavía no está en el repositorio.] Lo que sí podemos sostener hoy: la captura lleva 9 días con 21 de 22 ejecuciones exitosas, y la puerta de calidad no clasificó mal ningún registro en las 26 corridas del experimento. Eso es evidencia medida de fiabilidad y de exactitud de la puerta, no una afirmación.
 
 ---
 
@@ -84,6 +96,7 @@ Aprendimos a aplicar los modelos de calidad formalmente: la norma **ISO/IEC 2501
   - Declaración de Ética y Legalidad: [`docs/etica-datos.md`](etica-datos.md)
   - Manual de Linaje y Trazabilidad: [`docs/linaje-datos.md`](linaje-datos.md)
   - Diccionario de Datos actualizado: [`data/oro/diccionario_oro.csv`](../data/oro/diccionario_oro.csv)
+- **Experimento factorial (ruta ingeniería):** [`docs/experimento-E2.md`](experimento-E2.md), [`laboratorio/experimento.py`](../laboratorio/experimento.py), [`laboratorio/salidas/experimento/`](../laboratorio/salidas/experimento/), [`tests/test_experimento.py`](../tests/test_experimento.py)
 - **Tablero interactivo con cartografía:** [`tablero/app.py`](../tablero/app.py) (pestaña "Mapa geoespacial (DENUE)")
 - **Pruebas automáticas y aseguramiento:**
   - 26 pruebas unitarias aprobadas: [`tests/test_denue.py`](../tests/test_denue.py), [`tests/test_linaje.py`](../tests/test_linaje.py)
@@ -101,6 +114,7 @@ Declaramos el uso de asistentes de inteligencia artificial de acuerdo con los li
   1. Estructuración del extractor geoespacial `extractores/denue.py` y del pipeline de conversión GeoJSON sin dependencias binarias pesadas.
   2. Implementación de las pruebas unitarias automatizadas para validación de coordenadas, cuarentena y trazabilidad de linaje.
   3. Redacción inicial y organización de las secciones normativas de `docs/etica-datos.md` y `docs/linaje-datos.md`.
+  4. El 26 de noviembre, con Claude Code: diseño, código, corrida y análisis del experimento factorial (`laboratorio/experimento.py`), su reporte (`docs/experimento-E2.md`), la corrección de esta relatoría y la de la ficha de entrega.
 - **Aporte y control del equipo humano:**
   - Definición del sector veterinario de Colima, selección de los códigos SCIAN y diseño de las zonas urbanas de análisis.
   - Validación de las reglas geográficas del bounding box de Colima y diseño de los registros de control para la puerta de calidad.

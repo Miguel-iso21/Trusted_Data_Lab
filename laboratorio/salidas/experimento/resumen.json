@@ -1,0 +1,40 @@
+{
+  "medido_el": "2026-11-26 23:46",
+  "registros_base": 1737,
+  "corridas_2k3": 16,
+  "mal_clasificados_total_2k3": 0,
+  "shapiro_p_residuos": 0.7719572493695297,
+  "breusch_pagan_p": 0.04238011199168396,
+  "optimo_lote_grande": {
+    "formato": "parquet",
+    "motor": "pandera"
+  },
+  "prediccion_optimo_s": 0.1361892463674569,
+  "intervalo_prediccion_95_s": [
+    0.049134641404573354,
+    0.37748338638347145
+  ],
+  "confirmacion_optimo_media_s": 0.09420190000018917,
+  "confirmacion_actual_media_s": 0.1495865400000184,
+  "mejora_predicha_vs_actual_pct": 50.23651708836859,
+  "mejora_observada_vs_actual_pct": 37.02514945517318,
+  "welch_p_log": 2.840053788166376e-07,
+  "confirmacion_dentro_del_intervalo": true,
+  "corridas_2k4_completo": 16,
+  "corridas_2k4-1_fraccionado": 8,
+  "anova_2k3_p": {
+    "bloque": 0.013494,
+    "A": 0.874362,
+    "B": 9.9e-05,
+    "A:B": 0.770719,
+    "C": 6e-06,
+    "A:C": 0.158327,
+    "B:C": 0.000338,
+    "A:B:C": 0.085528
+  },
+  "anova_dos_factores_p": {
+    "C(formato)": 0.0,
+    "C(tamano)": 0.0,
+    "C(formato):C(tamano)": 0.0
+  }
+}
