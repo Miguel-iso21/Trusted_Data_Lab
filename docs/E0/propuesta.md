@@ -62,22 +62,31 @@ Repositorio: https://github.com/Miguel-iso21/Trusted_Data_Lab
   Hipótesis: un dólar más caro encarece los insumos importados y se refleja en los ingresos con
   algunos meses de rezago.
 
-### E2 · Experimento factorial (ruta negocio)
-**¿Qué combinación de mensaje, imagen y horario genera más mensajes de clientes en las
-publicaciones de una veterinaria de Colima?**
+### E2 · Experimento factorial (ruta ingeniería)
+**¿Qué configuración de la puerta de calidad (bronce → plata) procesa los datos en menos tiempo
+sin dejar de detectar los registros inválidos?**
 
 | Factor | Nivel − | Nivel + |
 |---|---|---|
-| A · Mensaje | Precio ("consulta a $___") | Beneficio ("revisa a tu mascota a tiempo") |
-| B · Imagen | Mascota sola | Veterinario atendiendo a la mascota |
-| C · Horario de publicación | Mañana (9:00) | Noche (20:00) |
+| A · Formato de escritura de la capa plata | CSV | Parquet |
+| B · Motor de validación | Fila por fila (pandas `iterrows`) | Vectorizado (pandera) |
+| C · Tamaño del lote | Datos reales de Banxico (×1) | Datos replicados ×20 |
 
-- Diseño 2³ = 8 tratamientos × 2 réplicas = 16 publicaciones, en orden aleatorio, en la página o el
-  WhatsApp Business de [COMPLETAR: veterinaria que aceptó participar].
-- Respuesta: mensajes o solicitudes de cita recibidos en las 24 h siguientes a cada publicación.
-  Solo contamos cuántos llegan; no guardamos nombres ni teléfonos.
-- Bloqueo: semana de publicación, porque la demanda cambia de una semana a otra.
-- Acuerdo con la veterinaria: [COMPLETAR: confirmado o pendiente, a más tardar el 16 de noviembre].
+- Diseño 2³ = 8 tratamientos × 2 réplicas = 16 corridas en orden aleatorio, con semilla guardada.
+- Respuestas: tiempo de procesamiento en segundos y registros mal clasificados. Se inyecta un 2 %
+  de registros inválidos conocidos, y la puerta debe mandarlos todos a cuarentena.
+- Bloqueo: cada réplica se corre como un bloque, porque el estado de la computadora (caché, otros
+  programas) cambia entre tandas.
+- Se corre contra una copia local de los datos de bronce, nunca contra las APIs de INEGI o Banxico.
+- Además: un diseño de dos factores con tres niveles (formato CSV/Parquet/Feather × tamaño
+  ×1/×10/×50), la comparación de un 2⁴ completo contra un 2⁴⁻¹ fraccionado y una corrida de
+  confirmación de la mejor combinación.
+
+> **Cambio de ruta.** En la primera versión de esta propuesta el experimento era de negocio: un 2³
+> de mensaje × imagen × horario en las publicaciones de la veterinaria entrevistada. No conseguimos
+> confirmar el acuerdo a tiempo para correr 16 publicaciones, así que el 26 de noviembre pasamos a la
+> ruta de ingeniería, que el proyecto también contempla. La ruta de negocio queda como trabajo futuro
+> con el mismo veterinario.
 
 ### E3 · Comparación multivariada (PCA y MANOVA)
 **¿Las tres zonas urbanas de Colima (Colima–Villa de Álvarez, Manzanillo y Tecomán) tienen perfiles
@@ -129,7 +138,9 @@ menos 1.5 s entre peticiones al mismo dominio y reintenta con espera exponencial
 
 ## 6. Nota sobre la fecha de entrega
 
-Esta propuesta se entrega el 13 de noviembre, después de la fecha de E0 (6 de noviembre). La
-captura automática empezó el mismo 13 de noviembre, así que la medición de fiabilidad de 7 días
-estará disponible el 20 de noviembre y no en E1. Lo registramos como lección del proyecto: la
-captura tenía que arrancar primero, porque todo lo demás depende de su historia.
+Esta propuesta se etiqueta como `e0` el 26 de noviembre, después de la fecha de E0 (6 de
+noviembre). Casi toda se escribió el 13 de noviembre; la entrevista se completó con la llamada de
+seguimiento del 24 de noviembre y el experimento pasó a la ruta de ingeniería el 26. La captura
+automática empezó el 13 de noviembre, así que la medición de fiabilidad de 7 días no estuvo lista
+para E1. Lo registramos como lección del proyecto: la captura tenía que arrancar primero, porque
+todo lo demás depende de su historia.
