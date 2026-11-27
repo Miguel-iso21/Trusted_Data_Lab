@@ -5,8 +5,8 @@ especializados de unidades económicas (INEGI DENUE) utilizando GeoPandas.
 Garantiza trazabilidad completa registrando el archivo de origen en capa bronce.
 """
 import glob
-from pathlib import Path
 import re
+from pathlib import Path
 
 import pandas as pd
 

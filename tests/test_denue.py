@@ -1,9 +1,7 @@
 """Pruebas de la fuente especializada INEGI DENUE, calidad espacial y cero datos personales."""
 import pandas as pd
-import pytest
 
-from extractores.denue import capturar, sanitizar_privacidad
-from pipeline.config import DENUE_BBOX_COLIMA, DENUE_MUNICIPIOS
+from extractores.denue import sanitizar_privacidad
 from pipeline.limpieza import validar_denue
 from pipeline.oro import procesar_denue_oro
 

@@ -4,7 +4,6 @@ Cada registro en la Capa Oro conserva trazabilidad completa hacia su archivo de 
 en Capa Bronce y su marca de tiempo de ingesta original.
 """
 from datetime import date
-from pathlib import Path
 
 import pandas as pd
 

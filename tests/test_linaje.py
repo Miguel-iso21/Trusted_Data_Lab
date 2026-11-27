@@ -1,9 +1,7 @@
 """Pruebas de linaje y trazabilidad completa de registros de Capa Oro a Capa Bronce."""
-from pathlib import Path
 import pandas as pd
-import pytest
 
-from pipeline.config import BRONCE, ORO
+from pipeline.config import ORO
 
 
 def test_linaje_todas_las_tablas_oro_tienen_metadatos_de_origen():

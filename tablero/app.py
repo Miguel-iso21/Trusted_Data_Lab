@@ -176,7 +176,7 @@ with tab_geo:
             df_mapa = df_mapa[df_mapa["zona_urbana"] == zona_sel]
 
         st.markdown(f"**Establecimientos visualizados:** {len(df_mapa)} de {len(denue)}")
-        st.map(df_mapa[["latitud", "longitud"]], zoom=10)
+        st.map(df_mapa, latitude="latitud", longitude="longitud", zoom=10)
 
         st.subheader("Distribución municipal de la oferta")
         chart_muni = (

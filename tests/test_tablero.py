@@ -1,5 +1,6 @@
 """El tablero carga sin errores con los datos reales del repositorio."""
 from pathlib import Path
+
 import pytest
 
 APP = Path(__file__).resolve().parents[1] / "tablero" / "app.py"

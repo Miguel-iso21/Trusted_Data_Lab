@@ -15,7 +15,6 @@ Si no hay token o la API no está accesible, provee el catálogo base certificad
 Uso:  python -m extractores.denue
 """
 import csv
-import json
 import os
 import sys
 import time
