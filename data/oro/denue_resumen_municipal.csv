@@ -1,11 +1,11 @@
 municipio,zona_urbana,total_establecimientos,total_veterinarias,total_pet_shops,total_esteticas,pct_micro_0_a_5,fuente_origen,fecha_actualizacion
-Armería,Valle Tecomán-Armería,2,1,0,0,100.0,inegi-denue,2026-11-26
-Colima,Metropolitana Colima-Villa de Álvarez,12,5,3,2,91.7,inegi-denue,2026-11-26
-Comala,Norte y Periférica,2,1,0,0,100.0,inegi-denue,2026-11-26
-Coquimatlán,Norte y Periférica,1,1,0,0,100.0,inegi-denue,2026-11-26
-Cuauhtémoc,Norte y Periférica,2,1,1,0,100.0,inegi-denue,2026-11-26
-Ixtlahuacán,Norte y Periférica,1,0,0,0,100.0,inegi-denue,2026-11-26
-Manzanillo,Costera Manzanillo,8,4,2,1,87.5,inegi-denue,2026-11-26
-Minatitlán,Norte y Periférica,1,0,0,0,100.0,inegi-denue,2026-11-26
-Tecomán,Valle Tecomán-Armería,6,2,1,1,83.3,inegi-denue,2026-11-26
-Villa de Álvarez,Metropolitana Colima-Villa de Álvarez,8,3,2,2,87.5,inegi-denue,2026-11-26
+Armería,Valle Tecomán-Armería,37,3,34,0,97.3,inegi-denue,2026-11-27
+Colima,Metropolitana Colima-Villa de Álvarez,153,35,108,9,77.8,inegi-denue,2026-11-27
+Comala,Norte y Periférica,12,0,12,0,66.7,inegi-denue,2026-11-27
+Coquimatlán,Norte y Periférica,28,3,24,1,100.0,inegi-denue,2026-11-27
+Cuauhtémoc,Norte y Periférica,25,6,19,0,96.0,inegi-denue,2026-11-27
+Ixtlahuacán,Norte y Periférica,8,1,7,0,75.0,inegi-denue,2026-11-27
+Manzanillo,Costera Manzanillo,127,26,97,4,81.1,inegi-denue,2026-11-27
+Minatitlán,Norte y Periférica,9,0,9,0,88.9,inegi-denue,2026-11-27
+Tecomán,Valle Tecomán-Armería,115,11,103,1,92.2,inegi-denue,2026-11-27
+Villa de Álvarez,Metropolitana Colima-Villa de Álvarez,124,37,79,7,82.3,inegi-denue,2026-11-27

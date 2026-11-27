@@ -20,7 +20,11 @@ vet_ingresos_mensual,fecha_ingesta,timestamp ISO,Fecha y hora UTC de la captura 
 vet_ingresos_mensual,fuente_origen,texto,Identificador del proveedor oficial (inegi-bise),trazabilidad linaje
 denue_colima_geo,id_denue,int/texto,Identificador único de unidad económica en DENUE,INEGI DENUE
 denue_colima_geo,nombre_comercial,texto,Nombre público o comercial del establecimiento,INEGI DENUE
-denue_colima_geo,razon_social,texto,Razón social de la empresa (sin nombres de personas físicas),INEGI DENUE
+denue_colima_geo,clee,texto,Clave Estadística Empresarial del establecimiento,INEGI DENUE
+denue_colima_geo,actividad_scian,texto,Descripción de la clase de actividad SCIAN,INEGI DENUE
+denue_colima_geo,ageb,texto,Área geoestadística básica donde se ubica,INEGI DENUE
+denue_colima_geo,manzana,texto,Manzana dentro del AGEB,INEGI DENUE
+denue_colima_geo,fecha_alta,texto,Fecha de alta del establecimiento en el DENUE,INEGI DENUE
 denue_colima_geo,codigo_actividad,texto,Código de 6 dígitos del SCIAN,INEGI DENUE
 denue_colima_geo,categoria_servicio,texto,Categoría estandarizada en el observatorio,calculado
 denue_colima_geo,estrato_personal,texto,"Rango de personas ocupadas (0 a 5, 6 a 10, etc.)",INEGI DENUE
@@ -36,7 +40,7 @@ denue_resumen_municipal,zona_urbana,texto,Región funcional del estado,calculado
 denue_resumen_municipal,total_establecimientos,int,Conteo total de establecimientos del sector animal,calculado
 denue_resumen_municipal,total_veterinarias,int,Conteo de clínicas y consultorios veterinarios (541941),calculado
 denue_resumen_municipal,total_pet_shops,int,Conteo de tiendas de mascotas y alimentos (461121),calculado
-denue_resumen_municipal,total_esteticas,int,Conteo de estéticas y cuidado canino (812110),calculado
+denue_resumen_municipal,total_esteticas,int,"Conteo de estéticas, hoteles y cuidado de mascotas (812990 filtrado)",calculado
 denue_resumen_municipal,pct_micro_0_a_5,float %,Porcentaje de microestablecimientos de 0 a 5 personas,calculado
 denue_resumen_municipal,fuente_origen,texto,Fuente de datos oficial,trazabilidad linaje
 denue_resumen_municipal,fecha_actualizacion,fecha,Fecha de generación del resumen (YYYY-MM-DD),calculado

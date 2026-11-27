@@ -23,7 +23,14 @@ DENUE_SECTORES = {
     "541941": "Servicios veterinarios para mascotas del sector privado",
     "541942": "Servicios veterinarios para el ganado y otros animales",
     "461121": "Comercio al por menor de alimentos y accesorios para mascotas",
-    "812110": "Servicios de estética, baño y cuidado de mascotas",
+    # El SCIAN no tiene clase propia para estéticas de mascotas: quedan en 812990 "Otros servicios
+    # personales" (que también incluye lectura de cartas, curanderos, etc.). Se filtra por nombre.
+    # Ojo: 812110 NO sirve, son salones de belleza para personas (2,402 en Colima en nov-2026).
+    "812990": "Otros servicios personales: solo cuidado, estética y hospedaje de mascotas",
+}
+# Clases que solo entran si el nombre del establecimiento indica que es de mascotas (decisión del equipo).
+DENUE_FILTRO_NOMBRE = {
+    "812990": r"CANIN|PERR|\bPET\b|MASCOT|ANIMAL|VETERIN|PELU-CAN|WOO?F|DOG",
 }
 DENUE_MUNICIPIOS = [
     "Colima",

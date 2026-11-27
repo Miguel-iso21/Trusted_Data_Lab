@@ -1,197 +1,138 @@
-"""Fuente 3 (Especializada): INEGI DENUE (Directorio Estadístico Nacional de Unidades Económicas).
+"""Fuente 3 (especializada, geoespacial): INEGI DENUE, Directorio Estadístico Nacional de Unidades Económicas.
 
-Captura de unidades económicas del sector de servicios veterinarios, tiendas de mascotas
-y estéticas caninas en el Estado de Colima (SCIAN 541941, 541942, 461121, 812110).
+Captura los establecimientos del Estado de Colima (clave de entidad 06) de las clases SCIAN definidas en
+pipeline/config.py (DENUE_SECTORES), con el método oficial BuscarAreaAct de la API del DENUE:
 
-Marco Ético y de Privacidad:
-- Cumple con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).
-- CERO DATOS PERSONALES: Se descartan nombres de propietarios o personas físicas, teléfonos
-  particulares y correos personales antes de guardar en la Capa Bronce.
-- Solo se almacenan datos públicos de establecimientos (nombre comercial, actividad, municipio,
-  coordenadas geográficas y estrato de personal ocupado).
+  https://www.inegi.org.mx/app/api/denue/v1/consulta/BuscarAreaAct/
+      {entidad}/{municipio}/{localidad}/{AGEB}/{manzana}/{sector}/{subsector}/{rama}/{clase}/{nombre}/
+      {registro_inicial}/{registro_final}/{Id}/{token}
 
-El token se lee de la variable de entorno INEGI_TOKEN si está disponible.
-Si no hay token o la API no está accesible, provee el catálogo base certificado de Colima.
+Reglas:
+- El token del DENUE es distinto del Banco de Indicadores; se lee de la variable de entorno DENUE_TOKEN
+  y nunca se escribe en el repositorio (la URL se guarda con <TOKEN>).
+- CERO DATOS PERSONALES (LFPDPPP): la razón social (que en personas físicas es su nombre), el teléfono,
+  el correo y el sitio web NO se copian del JSON; nunca llegan a la capa bronce.
+- Si la API falla, la captura falla y queda en la bitácora. No hay datos de respaldo inventados.
+
 Uso:  python -m extractores.denue
 """
 import csv
 import os
 import sys
 import time
+import unicodedata
 from datetime import UTC, datetime
 
 import pandas as pd
 
 from extractores.base import ExtractorEtico
-from pipeline.config import BITACORA, BRONCE, DENUE_SECTORES
-
-FUENTE = "inegi-denue"
-URL_BUSQUEDA = (
-    "https://www.inegi.org.mx/app/api/denue/v1/consulta/BuscarPorNombre/"
-    "{termino}/06/1/100/{token}"
+from pipeline.config import (
+    BITACORA,
+    BRONCE,
+    DENUE_ENTIDAD,
+    DENUE_FILTRO_NOMBRE,
+    DENUE_MUNICIPIOS,
+    DENUE_SECTORES,
 )
 
-# Semilla certificada de unidades económicas en Colima para operación offline/reproducible
-ESTABLECIMIENTOS_COLIMA_BASE = [
-    # Colima capital
-    (10101, "Clínica Veterinaria San Francisco", "Servicios Veterinarios San Francisco SA de CV", "541941", "0 a 5 personas", "Av. San Fernando", "340", "Centro", "28000", "Colima", 19.2458, -103.7251),
-    (10102, "Hospital Veterinario de Colima", "Hospital Veterinario de Colima SC", "541941", "6 a 10 personas", "Calzada Galván", "120", "Jardines de la Corregidora", "28030", "Colima", 19.2512, -103.7198),
-    (10103, "Animal Center Colima", "Animal Center Colima S de RL", "541941", "0 a 5 personas", "Av. Felipe Sevilla del Río", "450", "Lomas de Circunvalación", "28010", "Colima", 19.2550, -103.7150),
-    (10104, "Pet Shop & Spa Huellitas", "Comercializadora Huellitas Colima SA", "461121", "0 a 5 personas", "Av. Constitución", "810", "San Pablo", "28060", "Colima", 19.2480, -103.7225),
-    (10105, "Nutrición Animal y Mascotas El Colimense", "Distribuidora El Colimense SA de CV", "461121", "0 a 5 personas", "Calle Madero", "215", "Centro", "28000", "Colima", 19.2410, -103.7280),
-    (10106, "Farmacia Veterinaria y Forrajes La Palma", "Forrajes y Fármacos La Palma SA", "541942", "0 a 5 personas", "Blvd. Rodolfo Chávez Carrillo", "150", "Placetas", "28070", "Colima", 19.2360, -103.7200),
-    (10107, "Centro Médico Veterinario Sevilla", "Servicios Médicos Veterinarios Sevilla SC", "541941", "0 a 5 personas", "Calle Zaragoza", "412", "Centro", "28000", "Colima", 19.2435, -103.7265),
-    (10108, "Estética Canina Puppies Grooming", "Estética Puppies Colima", "812110", "0 a 5 personas", "Av. Tecnológico", "310", "Liberación", "28020", "Colima", 19.2435, -103.7350),
-    (10109, "Veterinaria y Acuario El Delfín", "Acuario y Veterinaria El Delfín SA", "461121", "0 a 5 personas", "Av. Niños Héroes", "520", "Santa Bárbara", "28017", "Colima", 19.2465, -103.7275),
-    (10110, "Consultorio Veterinario Dr. Peludo", "Servicios Veterinarios Especializados SA", "541941", "0 a 5 personas", "Calle José G. Alcaraz", "88", "Lomas Verdes", "28019", "Colima", 19.2530, -103.7230),
-    (10111, "Spa & Estética Mascota Bonita", "Servicios de Belleza Animal Bonita SC", "812110", "0 a 5 personas", "Av. de los Maestros", "640", "Magisterial", "28030", "Colima", 19.2505, -103.7180),
-    (10112, "Agroveterinaria La Campiña", "Insumos Pecuarios La Campiña SA", "541942", "0 a 5 personas", "Autopista Colima-Guadalajara Km 2", "S/N", "El Diezmo", "28010", "Colima", 19.2590, -103.7080),
+FUENTE = "inegi-denue"
+URL_AREA_ACT = (
+    "https://www.inegi.org.mx/app/api/denue/v1/consulta/BuscarAreaAct/"
+    "{entidad}/0/0/0/0/0/0/0/{clase}/0/{inicio}/{fin}/0/{token}"
+)
+TAMANO_PAGINA = 1000
 
-    # Villa de Álvarez
-    (10201, "Veterinaria Villa Pets", "Clínica Veterinaria Villa Pets SA de CV", "541941", "0 a 5 personas", "Av. María Ahumada de Gómez", "280", "La Gloria", "28970", "Villa de Álvarez", 19.2640, -103.7420),
-    (10202, "Clínica y Spa Canino La Villa", "Spa Canino La Villa SC", "812110", "0 a 5 personas", "Av. Benito Juárez", "415", "Centro", "28970", "Villa de Álvarez", 19.2685, -103.7380),
-    (10203, "Hospital Veterinario de Especialidades Las Palmas", "Especialidades Veterinarias Las Palmas SA", "541941", "6 a 10 personas", "Av. Paseo Miguel de la Madrid", "1250", "Real Bugambilias", "28978", "Villa de Álvarez", 19.2710, -103.7460),
-    (10204, "Tienda de Alimentos y Accesorios Peludos", "Comercio de Mascotas Peludos SA", "461121", "0 a 5 personas", "Av. Enrique Corona Morfín", "190", "Villa Izcalli", "28973", "Villa de Álvarez", 19.2620, -103.7490),
-    (10205, "Consultorio Veterinario Los Olivos", "Atención Veterinaria Los Olivos SA", "541941", "0 a 5 personas", "Calle Carmen Serdán", "104", "San Isidro", "28975", "Villa de Álvarez", 19.2750, -103.7355),
-    (10206, "Boutique y Estética Mascotas Felices", "Servicios Caninos Mascotas Felices SC", "812110", "0 a 5 personas", "Av. Akollman", "320", "Loma Bonita", "28984", "Villa de Álvarez", 19.2660, -103.7445),
-    (10207, "Forrajera y Veterinaria El Rebaño", "Forrajes El Rebaño de Colima SA", "541942", "0 a 5 personas", "Av. J. Merced Cabrera", "512", "Centro", "28970", "Villa de Álvarez", 19.2635, -103.7405),
-    (10208, "Mundo Mascota La Villa", "Distribuidora Mundo Mascota SA de CV", "461121", "0 a 5 personas", "Av. Tecnológico", "880", "Villas Alameda", "28988", "Villa de Álvarez", 19.2730, -103.7510),
-
-    # Manzanillo
-    (10301, "Hospital Veterinario del Puerto", "Hospital Veterinario del Puerto SA de CV", "541941", "6 a 10 personas", "Blvd. Miguel de la Madrid", "1420", "Salagua", "28867", "Manzanillo", 19.0980, -104.3120),
-    (10302, "Veterinaria del Mar Salagua", "Atención Animal del Mar SC", "541941", "0 a 5 personas", "Av. Paseo de las Gaviotas", "310", "Las Brisas", "28869", "Manzanillo", 19.1050, -104.3210),
-    (10303, "Clínica Veterinaria Santiago", "Servicios Veterinarios de la Costa SA", "541941", "0 a 5 personas", "Calle 28 de Agosto", "85", "Santiago", "28860", "Manzanillo", 19.1120, -104.3540),
-    (10304, "Pet Spa Manzanillo", "Estética y Baño Canino Manzanillo SC", "812110", "0 a 5 personas", "Av. Elías Zamora Verduzco", "620", "Valle de las Garzas", "28864", "Manzanillo", 19.0920, -104.3050),
-    (10305, "Distribuidora Veterinaria Costera", "Insumos Veterinarios del Pacífico SA", "461121", "0 a 5 personas", "Av. Teniente Azueta", "45", "Centro", "28800", "Manzanillo", 19.0550, -104.3160),
-    (10306, "Forrajes y Servicios Pecuarios El Fondeport", "Comercializadora Fondeport SA de CV", "541942", "0 a 5 personas", "Carretera Manzanillo-Minatitlán Km 1", "S/N", "Tapeixtles", "28876", "Manzanillo", 19.0710, -104.2890),
-    (10307, "Centro Veterinario Miramar", "Clínica Veterinaria Miramar SC", "541941", "0 a 5 personas", "Av. Manzanillo", "204", "Miramar", "28860", "Manzanillo", 19.1080, -104.3600),
-    (10308, "Mascotas y Alimentos Las Brisas", "Alimentos para Mascotas Las Brisas SA", "461121", "0 a 5 personas", "Blvd. Costero", "980", "Playa Azul", "28869", "Manzanillo", 19.0880, -104.3080),
-
-    # Tecomán
-    (10401, "Veterinaria y Farmacia El Valle", "Servicios Veterinarios del Valle SA", "541941", "0 a 5 personas", "Av. Insurgentes", "450", "Centro", "28100", "Tecomán", 18.9140, -103.8760),
-    (10402, "Hospital de Animales y Ganado Tecomán", "Centro de Salud Animal Tecomán SC", "541942", "6 a 10 personas", "Calle Hidalgo", "312", "Tepeyac", "28110", "Tecomán", 18.9180, -103.8710),
-    (10403, "Estética Canina Tecomán", "Estética Tecomense Canina", "812110", "0 a 5 personas", "Calle Torres Ortiz", "180", "Unión", "28130", "Tecomán", 18.9090, -103.8810),
-    (10404, "Agropecuaria y Veterinaria del Pacífico", "Agroinsumos del Pacífico SA de CV", "541942", "0 a 5 personas", "Prolongación 20 de Noviembre", "750", "Palma Real", "28120", "Tecomán", 18.9220, -103.8690),
-    (10405, "Consultorio Pequeñas Especies El Limonero", "Servicios Caninos El Limonero SC", "541941", "0 a 5 personas", "Av. Marciano Cabrera", "210", "Centro", "28100", "Tecomán", 18.9110, -103.8740),
-    (10406, "Alimentos y Accesorios Caninos Tecomán", "Comercializadora Canina SA", "461121", "0 a 5 personas", "Calle Medellín", "145", "Centro", "28100", "Tecomán", 18.9130, -103.8780),
-
-    # Armería
-    (10501, "Servicios Veterinarios Armería", "Atención Pecuaria de Armería SA", "541942", "0 a 5 personas", "Av. Netzahualcóyotl", "120", "Centro", "28300", "Armería", 18.9370, -103.9650),
-    (10502, "Consultorio Veterinario Cuyutlán Pets", "Cuyutlán Pequeñas Especies SC", "541941", "0 a 5 personas", "Calle Veracruz", "48", "Ejido Armería", "28310", "Armería", 18.9410, -103.9610),
-
-    # Comala
-    (10601, "Veterinaria Comala Pueblos Mágicos", "Atención Veterinaria Comala SC", "541941", "0 a 5 personas", "Calle Madero", "65", "Centro", "28450", "Comala", 19.3240, -103.7590),
-    (10602, "Forrajera y Veterinaria El Nogueras", "Insumos Pecuarios El Nogueras SA", "541942", "0 a 5 personas", "Camino a Nogueras", "12", "Nogueras", "28452", "Comala", 19.3180, -103.7520),
-
-    # Cuauhtémoc
-    (10701, "Clínica Veterinaria Cuauhtémoc", "Servicios Veterinarios Cuauhtémoc SA", "541941", "0 a 5 personas", "Calle Hidalgo", "88", "Centro", "28500", "Cuauhtémoc", 19.3280, -103.6020),
-    (10702, "Veterinaria y Alimentos El Trapiche", "Distribuidora El Trapiche SC", "461121", "0 a 5 personas", "Carretera Libre Colima-Guadalajara", "Km 10", "El Trapiche", "28550", "Cuauhtémoc", 19.2890, -103.6540),
-
-    # Coquimatlán
-    (10801, "Veterinaria Los Chigüilines", "Clínica Veterinaria Los Chigüilines SA", "541941", "0 a 5 personas", "Av. Juárez", "210", "Centro", "28400", "Coquimatlán", 19.2060, -103.8050),
-
-    # Ixtlahuacán
-    (10901, "Veterinaria Municipal Ixtlahuacán", "Servicios Agropecuarios Ixtlahuacán SC", "541942", "0 a 5 personas", "Calle México", "35", "Centro", "28260", "Ixtlahuacán", 18.9990, -103.7380),
-
-    # Minatitlán
-    (11001, "Consultorio Veterinario La Sierra", "Atención Animal La Sierra SC", "541942", "0 a 5 personas", "Calle Zaragoza", "18", "Centro", "28700", "Minatitlán", 19.3840, -104.0580),
-
-    # Registros de control para probar la Puerta de Calidad (serán derivados a Cuarentena con motivo)
-    (99001, "Control Fuera de Estado", "Veterinaria Centro CDMX", "541941", "0 a 5 personas", "Paseo de la Reforma", "100", "Juárez", "06600", "Cuauhtémoc CDMX", 19.4326, -99.1332),
-    (99002, "Control Coordenada Nula", "Veterinaria Sin GPS", "541941", "0 a 5 personas", "Calle Desconocida", "0", "Sin Colonia", "00000", "Colima", None, None),
+# Campos del JSON que se conservan -> nombre en bronce. Lo que no está aquí no se guarda.
+CAMPOS = {
+    "Id": "id_denue",
+    "CLEE": "clee",
+    "Nombre": "nombre_comercial",
+    "Clase_actividad": "actividad_scian",
+    "Estrato": "estrato_personal",
+    "Tipo_vialidad": "tipo_vialidad",
+    "Calle": "calle",
+    "Num_Exterior": "numero_exterior",
+    "Colonia": "colonia",
+    "CP": "codigo_postal",
+    "AGEB": "ageb",
+    "Manzana": "manzana",
+    "Fecha_Alta": "fecha_alta",
+    "Latitud": "latitud",
+    "Longitud": "longitud",
+}
+# Campos que pueden identificar a personas físicas: se descartan siempre.
+CAMPOS_PERSONALES = [
+    "Razon_social", "razon_social", "Telefono", "telefono", "Correo_e", "correo", "Sitio_internet",
+    "sitio_internet", "nombre_propietario", "telefono_particular", "correo_personal", "curp",
+    "rfc_persona_fisica",
 ]
 
 
-def _crear_dataframe_base() -> pd.DataFrame:
-    columnas = [
-        "id_denue",
-        "nombre_comercial",
-        "razon_social",
-        "codigo_actividad",
-        "estrato_personal",
-        "tipo_vialidad",
-        "numero_exterior",
-        "colonia",
-        "codigo_postal",
-        "municipio",
-        "latitud",
-        "longitud",
-    ]
-    df = pd.DataFrame(ESTABLECIMIENTOS_COLIMA_BASE, columns=columnas)
-    df["actividad_scian"] = df["codigo_actividad"].map(DENUE_SECTORES).fillna("Otra actividad")
-    return df
+def _sin_acentos(texto: str) -> str:
+    base = unicodedata.normalize("NFKD", texto)
+    return "".join(c for c in base if not unicodedata.combining(c)).casefold().strip()
+
+
+_MUNICIPIOS = {_sin_acentos(m): m for m in DENUE_MUNICIPIOS}
+
+
+def municipio_de_ubicacion(ubicacion: str) -> str:
+    """'LOCALIDAD, Municipio, ENTIDAD' -> nombre oficial del municipio de Colima (o el texto tal cual)."""
+    partes = [p.strip() for p in str(ubicacion or "").split(",")]
+    candidato = partes[1] if len(partes) >= 3 else (partes[0] if partes else "")
+    return _MUNICIPIOS.get(_sin_acentos(candidato), candidato)
 
 
 def sanitizar_privacidad(df: pd.DataFrame) -> pd.DataFrame:
-    """Garantiza CERO DATOS PERSONALES conforme a la LFPDPPP.
-    
-    Elimina cualquier campo susceptible de identificar a personas físicas (apellidos de particulares,
-    números telefónicos personales o correos electrónicos personales). Solo conserva
-    metadatos de unidades económicas y su localización pública.
-    """
-    df = df.copy()
-    # Lista explícita de campos prohibidos de personas físicas
-    campos_personales = ["nombre_propietario", "telefono_particular", "correo_personal", "curp", "rfc_persona_fisica"]
-    for col in campos_personales:
-        if col in df.columns:
-            df = df.drop(columns=[col])
+    """Elimina cualquier columna que pueda identificar a una persona física (LFPDPPP)."""
+    return df.drop(columns=[c for c in CAMPOS_PERSONALES if c in df.columns])
 
-    # Asegurar que razón social sea genérica o institucional
+
+def parsear(items: list[dict], clase: str, url_sin_token: str) -> pd.DataFrame:
+    filas = []
+    for item in items:
+        fila = {destino: item.get(origen) for origen, destino in CAMPOS.items()}
+        fila["codigo_actividad"] = str(item.get("CLASE_ACTIVIDAD_ID") or clase)
+        fila["municipio"] = municipio_de_ubicacion(item.get("Ubicacion", ""))
+        filas.append(fila)
+    df = pd.DataFrame(filas, columns=[*CAMPOS.values(), "codigo_actividad", "municipio"])
+    df["latitud"] = pd.to_numeric(df["latitud"], errors="coerce")
+    df["longitud"] = pd.to_numeric(df["longitud"], errors="coerce")
+    df["fuente"] = FUENTE
+    df["url_origen"] = url_sin_token
     return df
 
 
-def capturar_api(token: str, extractor: ExtractorEtico) -> pd.DataFrame:
-    """Consume la API REST oficial de INEGI DENUE."""
-    registros = []
-    terminos = ["veterinaria", "mascotas", "animales", "alimento"]
-    for term in terminos:
-        url = URL_BUSQUEDA.format(termino=term, token=token)
-        url_sin_token = url.replace(token, "<TOKEN>")
-        try:
-            r = extractor.get(url)
-            data = r.json()
-            for item in data:
-                registros.append({
-                    "id_denue": item.get("Id"),
-                    "nombre_comercial": item.get("Nombre"),
-                    "razon_social": item.get("Razon_social", ""),
-                    "codigo_actividad": str(item.get("Clase_actividad", "")),
-                    "actividad_scian": item.get("Descripcion_actividad", ""),
-                    "estrato_personal": item.get("Estrato", "0 a 5 personas"),
-                    "tipo_vialidad": item.get("Tipo_vialidad", ""),
-                    "numero_exterior": item.get("Numero_exterior", ""),
-                    "colonia": item.get("Colonia", ""),
-                    "codigo_postal": item.get("CP", ""),
-                    "municipio": item.get("Municipio", ""),
-                    "latitud": float(item.get("Latitud")) if item.get("Latitud") else None,
-                    "longitud": float(item.get("Longitud")) if item.get("Longitud") else None,
-                    "fuente": FUENTE,
-                    "url_origen": url_sin_token,
-                })
-        except Exception:
-            continue
-    if not registros:
-        raise RuntimeError("No se obtuvieron registros de la API DENUE.")
-    return pd.DataFrame(registros).drop_duplicates(subset=["id_denue"])
+def filtrar_por_nombre(df: pd.DataFrame, clase: str) -> pd.DataFrame:
+    """En clases mixtas (DENUE_FILTRO_NOMBRE) conserva solo los establecimientos de mascotas."""
+    patron = DENUE_FILTRO_NOMBRE.get(clase)
+    if patron is None or df.empty:
+        return df
+    return df[df["nombre_comercial"].fillna("").str.upper().str.contains(patron, regex=True)]
 
 
 def capturar(extractor: ExtractorEtico | None = None) -> pd.DataFrame:
-    token = os.environ.get("INEGI_TOKEN")
+    token = os.environ.get("DENUE_TOKEN")
+    if not token:
+        raise RuntimeError("Falta la variable de entorno DENUE_TOKEN (token de la API del DENUE)")
     ex = extractor or ExtractorEtico()
-    if token:
-        try:
-            df = capturar_api(token, ex)
-            url_meta = "https://www.inegi.org.mx/app/api/denue/v1/consulta/BuscarPorNombre/<TERMINO>/06/1/100/<TOKEN>"
-        except Exception:
-            df = _crear_dataframe_base()
-            url_meta = "https://www.inegi.org.mx/app/api/denue/v1/consulta/colima_seed"
-    else:
-        df = _crear_dataframe_base()
-        url_meta = "https://www.inegi.org.mx/app/api/denue/v1/consulta/colima_seed"
-
-    df = sanitizar_privacidad(df)
-    df["fuente"] = FUENTE
-    df["url_origen"] = url_meta
+    partes = []
+    for clase in DENUE_SECTORES:
+        inicio = 1
+        while True:
+            fin = inicio + TAMANO_PAGINA - 1
+            url = URL_AREA_ACT.format(entidad=DENUE_ENTIDAD, clase=clase, inicio=inicio, fin=fin, token=token)
+            items = ex.get(url).json() or []
+            if not isinstance(items, list):  # la API responde un objeto cuando no hay resultados
+                items = []
+            partes.append(filtrar_por_nombre(parsear(items, clase, url.replace(token, "<TOKEN>")), clase))
+            if len(items) < TAMANO_PAGINA:
+                break
+            inicio = fin + 1
+    df = pd.concat(partes, ignore_index=True)
+    if df.empty:
+        raise RuntimeError("La API del DENUE no devolvió establecimientos para Colima")
+    df = sanitizar_privacidad(df.drop_duplicates(subset=["id_denue"]))
     df["capturado_en"] = datetime.now(UTC).isoformat(timespec="seconds")
     return df
 
@@ -209,21 +150,20 @@ def registrar_bitacora(estado: str, filas: int, segundos: float, error: str = ""
 
 def main() -> int:
     t0 = time.time()
+    token = os.environ.get("DENUE_TOKEN", "")
     try:
         df = capturar()
         destino = BRONCE / "denue"
         destino.mkdir(parents=True, exist_ok=True)
-        sello = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-        archivo_salida = destino / f"denue_colima_{sello}.csv"
-        df.to_csv(archivo_salida, index=False)
-        duracion = time.time() - t0
-        registrar_bitacora("ok", len(df), duracion)
-        print(f"OK DENUE: {len(df)} unidades económicas guardadas en {archivo_salida.name}")
+        archivo = destino / f"denue_colima_{datetime.now(UTC):%Y%m%dT%H%M%S}.csv"
+        df.to_csv(archivo, index=False)
+        registrar_bitacora("ok", len(df), time.time() - t0)
+        print(f"OK DENUE: {len(df)} establecimientos guardados en {archivo.name}")
         return 0
-    except Exception as e:
-        duracion = time.time() - t0
-        registrar_bitacora("falla", 0, duracion, str(e)[:200])
-        print(f"FALLA DENUE: {e}", file=sys.stderr)
+    except Exception as e:  # toda falla queda en la bitacora (dato de fiabilidad); el token nunca se escribe
+        error = str(e).replace(token, "<TOKEN>") if token else str(e)
+        registrar_bitacora("falla", 0, time.time() - t0, error[:200])
+        print(f"FALLA DENUE: {error}", file=sys.stderr)
         return 1
 
 

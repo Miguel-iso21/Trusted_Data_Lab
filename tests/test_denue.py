@@ -1,6 +1,8 @@
 """Pruebas de la fuente especializada INEGI DENUE, calidad espacial y cero datos personales."""
 import pandas as pd
+import pytest
 
+from extractores import denue
 from extractores.denue import sanitizar_privacidad
 from pipeline.limpieza import validar_denue
 from pipeline.oro import procesar_denue_oro
@@ -99,3 +101,72 @@ def test_denue_procesamiento_oro_y_zonas():
     assert "Clínica Veterinaria" in geo_oro.loc[0, "categoria_servicio"]
     assert "Pet Shop" in geo_oro.loc[1, "categoria_servicio"]
     assert len(resumen) == 2
+
+
+# ---------- extractor (sin red: respuestas simuladas) ----------
+class _Resp:
+    def __init__(self, payload):
+        self._payload = payload
+
+    def json(self):
+        return self._payload
+
+
+class _ExtractorFalso:
+    """Devuelve 1 establecimiento por clase SCIAN y registra las URL pedidas."""
+
+    def __init__(self):
+        self.urls = []
+
+    def get(self, url, **kwargs):
+        self.urls.append(url)
+        clase = url.split("/")[-6]  # .../{clase}/0/{inicio}/{fin}/0/{token}
+        return _Resp([{
+            "Id": f"9{clase}", "CLEE": "06002", "Nombre": "VETERINARIA DE PRUEBA",
+            "Razon_social": "JUAN PEREZ LOPEZ", "Telefono": "3121234567", "Correo_e": "x@y.mx",
+            "Sitio_internet": "www.x.mx", "Clase_actividad": "Servicios veterinarios",
+            "CLASE_ACTIVIDAD_ID": clase, "Estrato": "0 a 5 personas",
+            "Ubicacion": "VILLA DE ALVAREZ, Villa de Álvarez, COLIMA",
+            "Latitud": "19.26", "Longitud": "-103.73",
+        }])
+
+
+def test_municipio_se_toma_de_ubicacion_y_se_normaliza():
+    assert denue.municipio_de_ubicacion("MANZANILLO, Manzanillo, COLIMA") == "Manzanillo"
+    assert denue.municipio_de_ubicacion("TECOMAN, tecoman, COLIMA") == "Tecomán"
+    assert denue.municipio_de_ubicacion("X, Guadalajara, JALISCO") == "Guadalajara"
+
+
+def test_capturar_sin_token_falla_sin_datos_de_respaldo(monkeypatch):
+    monkeypatch.delenv("DENUE_TOKEN", raising=False)
+    with pytest.raises(RuntimeError, match="DENUE_TOKEN"):
+        denue.capturar(_ExtractorFalso())
+
+
+def test_capturar_no_guarda_datos_personales_ni_el_token(monkeypatch):
+    monkeypatch.setenv("DENUE_TOKEN", "SECRETO123")
+    ex = _ExtractorFalso()
+    df = denue.capturar(ex)
+    assert len(df) == len(denue.DENUE_SECTORES)  # una consulta por clase SCIAN
+    for col in ("Razon_social", "razon_social", "Telefono", "Correo_e", "Sitio_internet"):
+        assert col not in df.columns
+    texto = df.to_csv(index=False)
+    assert "JUAN PEREZ" not in texto and "3121234567" not in texto and "SECRETO123" not in texto
+    assert set(df["municipio"]) == {"Villa de Álvarez"}
+    assert all("/06/" in u for u in ex.urls)  # siempre la entidad de Colima
+
+
+def test_main_registra_falla_en_bitacora(monkeypatch, tmp_path):
+    monkeypatch.delenv("DENUE_TOKEN", raising=False)
+    monkeypatch.setattr(denue, "BITACORA", tmp_path / "bitacora.csv")
+    assert denue.main() == 1
+    assert pd.read_csv(tmp_path / "bitacora.csv")["estado"].tolist() == ["falla"]
+
+
+def test_filtro_812990_conserva_solo_negocios_de_mascotas():
+    nombres = ["ESTETICA CANINA PATITAS", "HOTEL CANINO REYES", "PET WORLD", "REFUGIO ANIMAL MANZANILLO",
+               "LECTURA DE CARTAS SIN NOMBRE", "CAMINOS DE LA VIDA", "VITA MEDICINA ESTETICA"]
+    df = pd.DataFrame({"nombre_comercial": nombres})
+    quedan = denue.filtrar_por_nombre(df, "812990")["nombre_comercial"].tolist()
+    assert quedan == nombres[:4]
+    assert len(denue.filtrar_por_nombre(df, "541941")) == len(nombres)  # otras clases no se filtran

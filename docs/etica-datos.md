@@ -76,23 +76,17 @@ Todas las extracciones automatizadas del proyecto pasan obligatoriamente por el 
 En estricto cumplimiento con la **Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)**, el observatorio implementa una política de segregación y sanitización en Capa Bronce:
 
 ### 5.1. Distinción de Datos
-- **Datos Públicos Permitidos:** Nombre comercial del establecimiento, razón social institucional, clave y descripción de actividad económica (SCIAN), estrato de personal ocupado (ej. "0 a 5 personas"), coordenadas geográficas (latitud, longitud), municipio, colonia y código postal.
-- **Datos Personales Prohibidos:** Nombres y apellidos de personas físicas propietarias o administradoras, teléfonos residenciales o celulares personales, correos electrónicos particulares, CURP, RFC de personas físicas o imágenes de personas/rostros.
+- **Datos que se conservan:** identificador del DENUE y CLEE, nombre comercial del establecimiento, clave y descripción de la actividad (SCIAN), estrato de personal ocupado (por ejemplo, "0 a 5 personas"), tipo de vialidad, calle, número exterior, colonia, código postal, AGEB, manzana, fecha de alta, municipio y coordenadas.
+- **Datos que nunca se guardan:** la **razón social** (en una persona física es su nombre completo), el **teléfono**, el **correo electrónico** y el **sitio web**. La API del DENUE sí los devuelve, pero el extractor no los copia.
 
 ### 5.2. Mecanismo de Sanitización Técnica
-En el extractor `extractores/denue.py`, la función `sanitizar_privacidad(df)` evalúa y descarta cualquier columna susceptible de contener datos personales antes de persistir el archivo en `data/bronce/denue/`:
-```python
-def sanitizar_privacidad(df: pd.DataFrame) -> pd.DataFrame:
-    campos_personales = [
-        "nombre_propietario", "telefono_particular", "correo_personal",
-        "curp", "rfc_persona_fisica"
-    ]
-    for col in campos_personales:
-        if col in df.columns:
-            df = df.drop(columns=[col])
-    return df
-```
-De este modo, ningún dato personal ingresa jamás a la Capa Bronce, Plata u Oro, imposibilitando fugas de privacidad o almacenamiento no autorizado en repositorios de código.
+El extractor `extractores/denue.py` trabaja con una **lista blanca** (`CAMPOS`): de cada establecimiento que devuelve la API solo copia los campos de la lista de arriba. Lo que no está en la lista no llega nunca a `data/bronce/denue/`. Además, `sanitizar_privacidad(df)` elimina cualquier columna de la lista `CAMPOS_PERSONALES` que aparezca por error. Esto lo verifica la prueba `test_capturar_no_guarda_datos_personales_ni_el_token`, con una respuesta simulada que trae razón social, teléfono y correo.
+
+### 5.3. Decisión sobre el nombre comercial
+Algunos negocios pequeños usan el nombre de su dueña o dueño como nombre comercial (por ejemplo, "Estética Canina" seguida de un nombre propio). Decidimos **conservar el nombre comercial** porque es el nombre público con el que el establecimiento se anuncia y con el que INEGI lo publica en el DENUE; no es un dato de contacto ni identifica a la persona fuera de su negocio. Si un establecimiento pidiera no aparecer, se elimina su registro. Mostrar solo el giro, sin nombre, queda como alternativa si el equipo docente lo considera necesario.
+
+### 5.4. Corrección del 27 de noviembre de 2026
+Hasta esa fecha, el extractor del DENUE usaba, sin avisar, una lista de 45 establecimientos escritos a mano cuando la API fallaba, y esa lista llegó a bronce marcada como `inegi-denue`. Esos registros se eliminaron de todas las capas. Desde entonces la captura usa solo la API oficial (con `DENUE_TOKEN`), y si falla lo registra en la bitácora sin sustituir los datos.
 
 ---
 

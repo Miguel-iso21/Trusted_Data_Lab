@@ -48,7 +48,7 @@ jobs:
         id: denue
         continue-on-error: true
         env:
-          INEGI_TOKEN: ${{ secrets.INEGI_TOKEN }}
+          DENUE_TOKEN: ${{ secrets.DENUE_TOKEN }}
           TDL_CONTACTO: ${{ vars.TDL_CONTACTO }}
         run: python -m extractores.denue
 

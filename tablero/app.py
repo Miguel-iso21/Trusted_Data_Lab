@@ -4,6 +4,7 @@ Solo LEE archivos ya generados por el pipeline y el laboratorio; no llama APIs.
 Incluye visualización cartográfica geoespacial (INEGI DENUE) y linaje de datos.
 Ejecutar:  streamlit run tablero/app.py
 """
+
 from pathlib import Path
 
 import altair as alt
@@ -18,8 +19,18 @@ SALIDAS = RAIZ / "laboratorio" / "salidas"
 CALIDAD = RAIZ / "calidad"
 
 MESES = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
-    "octubre", "noviembre", "diciembre"
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
 ]
 
 
@@ -78,12 +89,14 @@ c2.metric(
 c3.metric("Dólar FIX (último mes)", f"${usd['usd_media'].iloc[-1]:.2f}")
 c4.metric("Última captura", f"{bitacora['timestamp_utc'].max():%d/%m/%Y %H:%M} UTC")
 
-tab_pron, tab_hist, tab_geo, tab_cal = st.tabs([
-    "Pronóstico",
-    "Historia y dólar",
-    "Mapa geoespacial (DENUE)",
-    "Calidad y linaje",
-])
+tab_pron, tab_hist, tab_geo, tab_cal = st.tabs(
+    [
+        "Pronóstico",
+        "Historia y dólar",
+        "Mapa geoespacial (DENUE)",
+        "Calidad y linaje",
+    ]
+)
 
 # ---------------------------------------------------------------- Pronóstico
 with tab_pron:
@@ -97,23 +110,33 @@ with tab_pron:
         "El pronóstico es plano: el modelo no ve una tendencia clara a subir o bajar."
     )
     hist = vet[vet["mes"] >= vet["mes"].max() - pd.DateOffset(years=5)]
-    base = alt.Chart(hist).mark_line(color="#2563eb").encode(
-        x=alt.X("mes:T", title=None),
-        y=alt.Y("indice_ingresos:Q", title="Índice (2018 = 100)", scale=alt.Scale(zero=False)),
-        tooltip=[alt.Tooltip("mes:T", format="%b %Y"), alt.Tooltip("indice_ingresos:Q", format=".1f")],
+    base = (
+        alt.Chart(hist)
+        .mark_line(color="#2563eb")
+        .encode(
+            x=alt.X("mes:T", title=None),
+            y=alt.Y("indice_ingresos:Q", title="Índice (2018 = 100)", scale=alt.Scale(zero=False)),
+            tooltip=[alt.Tooltip("mes:T", format="%b %Y"), alt.Tooltip("indice_ingresos:Q", format=".1f")],
+        )
     )
-    banda = alt.Chart(fut).mark_area(opacity=0.2, color="#f97316").encode(
-        x="mes:T", y="inferior_95:Q", y2="superior_95:Q"
+    banda = (
+        alt.Chart(fut)
+        .mark_area(opacity=0.2, color="#f97316")
+        .encode(x="mes:T", y="inferior_95:Q", y2="superior_95:Q")
     )
-    linea = alt.Chart(fut).mark_line(color="#f97316", strokeDash=[5, 3]).encode(
-        x="mes:T",
-        y="mean:Q",
-        tooltip=[
-            alt.Tooltip("mes:T", format="%b %Y"),
-            alt.Tooltip("mean:Q", format=".1f", title="pronóstico"),
-            alt.Tooltip("inferior_95:Q", format=".1f"),
-            alt.Tooltip("superior_95:Q", format=".1f"),
-        ],
+    linea = (
+        alt.Chart(fut)
+        .mark_line(color="#f97316", strokeDash=[5, 3])
+        .encode(
+            x="mes:T",
+            y="mean:Q",
+            tooltip=[
+                alt.Tooltip("mes:T", format="%b %Y"),
+                alt.Tooltip("mean:Q", format=".1f", title="pronóstico"),
+                alt.Tooltip("inferior_95:Q", format=".1f"),
+                alt.Tooltip("superior_95:Q", format=".1f"),
+            ],
+        )
     )
     st.altair_chart(base + banda + linea, width="stretch")
     st.caption("Azul: datos reales de INEGI. Naranja: pronóstico con su intervalo de 95 %.")
@@ -152,7 +175,8 @@ with tab_geo:
         "**Fuente especializada (E2):** INEGI DENUE georreferenciado mediante GeoPandas (EPSG:4326). "
         "Permite identificar la concentración de clínicas veterinarias, farmacias/alimentos y estéticas "
         "caninas en las tres principales zonas urbanas: Zona Metropolitana Colima-Villa de Álvarez, "
-        "Costera (Manzanillo) y Valle Tecomán-Armería. **Cero datos personales:** solo unidades económicas públicas."
+        "Costera (Manzanillo) y Valle Tecomán-Armería. "
+        "**Cero datos personales:** solo unidades económicas públicas."
     )
 
     if not denue.empty:
@@ -185,7 +209,9 @@ with tab_geo:
             .encode(
                 x=alt.X("municipio:N", title="Municipio", sort="-y"),
                 y=alt.Y("count():Q", title="Número de establecimientos"),
-                color=alt.Color("categoria_servicio:N", title="Categoría", scale=alt.Scale(scheme="category10")),
+                color=alt.Color(
+                    "categoria_servicio:N", title="Categoría", scale=alt.Scale(scheme="category10")
+                ),
                 tooltip=["municipio:N", "categoria_servicio:N", "count():Q"],
             )
         )
@@ -193,16 +219,18 @@ with tab_geo:
 
         st.subheader("Directorio detallado con trazabilidad")
         st.dataframe(
-            df_mapa[[
-                "id_denue",
-                "nombre_comercial",
-                "categoria_servicio",
-                "municipio",
-                "estrato_personal",
-                "zona_urbana",
-                "archivo_bronce_origen",
-                "fecha_ingesta",
-            ]],
+            df_mapa[
+                [
+                    "id_denue",
+                    "nombre_comercial",
+                    "categoria_servicio",
+                    "municipio",
+                    "estrato_personal",
+                    "zona_urbana",
+                    "archivo_bronce_origen",
+                    "fecha_ingesta",
+                ]
+            ],
             hide_index=True,
             width="stretch",
         )
@@ -211,7 +239,10 @@ with tab_geo:
             st.subheader("Resumen consolidado por municipio")
             st.dataframe(resumen_muni, hide_index=True, width="stretch")
     else:
-        st.warning("No se encontró el dataset geoespacial en la capa oro. Ejecute el pipeline.")
+        st.warning(
+            "Datos del DENUE pendientes: la captura real empieza en cuanto se configure el token "
+            "de la API del DENUE. Este mapa no muestra datos de ejemplo."
+        )
 
 # ---------------------------------------------------------------- Calidad
 with tab_cal:
@@ -229,12 +260,14 @@ with tab_cal:
         ruta_malos = CUARENTENA / arch_malos
         ok = len(leer(ruta_ok)) if ruta_ok.exists() else 0
         malos = len(leer(ruta_malos)) if ruta_malos.exists() else 0
-        filas.append({
-            "fuente": fuente,
-            "aprobados (plata)": ok,
-            "en cuarentena": malos,
-            "tasa de rechazo %": round(100 * malos / max(ok + malos, 1), 2),
-        })
+        filas.append(
+            {
+                "fuente": fuente,
+                "aprobados (plata)": ok,
+                "en cuarentena": malos,
+                "tasa de rechazo %": round(100 * malos / max(ok + malos, 1), 2),
+            }
+        )
     st.dataframe(pd.DataFrame(filas), hide_index=True, width="stretch")
     st.caption(
         "Ningún registro se borra en silencio: los rechazados se guardan con su motivo en data/cuarentena/. "
@@ -244,19 +277,27 @@ with tab_cal:
     st.subheader("🔗 Linaje y trazabilidad de datos (Capa Oro a Bronce)")
     st.info(
         "Cada registro en la Capa Oro es 100 % rastreable hasta su archivo original en la Capa Bronce, "
-        "su fecha de ingesta en UTC y su identificador de proveedor oficial, cumpliendo con la gobernanza de datos."
+        "su fecha de ingesta en UTC y su identificador de proveedor oficial, "
+        "cumpliendo con la gobernanza de datos."
     )
     col_l1, col_l2, col_l3 = st.columns(3)
     with col_l1:
         st.markdown("**Tipo de Cambio (Banxico SIE):**")
-        st.dataframe(usd[["mes", "usd_media", "archivo_bronce_origen", "fecha_ingesta"]].tail(3), hide_index=True)
+        st.dataframe(
+            usd[["mes", "usd_media", "archivo_bronce_origen", "fecha_ingesta"]].tail(3), hide_index=True
+        )
     with col_l2:
         st.markdown("**Ingresos Veterinarios (INEGI BISE):**")
-        st.dataframe(vet[["mes", "indice_ingresos", "archivo_bronce_origen", "fecha_ingesta"]].tail(3), hide_index=True)
+        st.dataframe(
+            vet[["mes", "indice_ingresos", "archivo_bronce_origen", "fecha_ingesta"]].tail(3), hide_index=True
+        )
     with col_l3:
         st.markdown("**Directorio Geoespacial (INEGI DENUE):**")
         if not denue.empty:
-            st.dataframe(denue[["id_denue", "nombre_comercial", "archivo_bronce_origen", "fecha_ingesta"]].head(3), hide_index=True)
+            st.dataframe(
+                denue[["id_denue", "nombre_comercial", "archivo_bronce_origen", "fecha_ingesta"]].head(3),
+                hide_index=True,
+            )
 
     st.subheader("Bitácora de capturas automáticas")
     st.dataframe(bitacora.sort_values("timestamp_utc", ascending=False), hide_index=True, width="stretch")
